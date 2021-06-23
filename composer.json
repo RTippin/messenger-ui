@@ -1,0 +1,37 @@
+{
+    "name": "rtippin/messenger-ui",
+    "description": "Laravel messenger suite UI.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Richard Tippin",
+            "email": "tippindev@gmail.com",
+            "homepage": "https://tippindev.com"
+        }
+    ],
+    "homepage": "https://github.com/rtippin/messenger-ui",
+    "keywords": [
+        "Laravel",
+        "Messenger"
+    ],
+    "require": {
+        "rtippin/messenger": "^0.35"
+    },
+    "autoload": {
+        "psr-4": {
+            "RTippin\\MessengerUi\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "RTippin\\Messenger\\MessengerUiServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
