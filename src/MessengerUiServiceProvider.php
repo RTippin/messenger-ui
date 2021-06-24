@@ -82,7 +82,7 @@ class MessengerUiServiceProvider extends ServiceProvider
             'domain' => config('messenger-ui.routing.domain'),
             'prefix' => trim(config('messenger-ui.routing.prefix'), '/'),
             'middleware' => $invite
-                ? config('messenger-ui.routing.invite_web_middleware')
+                ? config('messenger-ui.routing.invite_middleware')
                 : config('messenger-ui.routing.middleware'),
         ];
     }
