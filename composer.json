@@ -15,7 +15,7 @@
         "Messenger"
     ],
     "require": {
-        "rtippin/messenger": "^0.35"
+        "rtippin/messenger": "dev-dev"
     },
     "autoload": {
         "psr-4": {
@@ -25,7 +25,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "RTippin\\Messenger\\MessengerUiServiceProvider"
+                "RTippin\\MessengerUi\\MessengerUiServiceProvider"
             ]
         }
     },

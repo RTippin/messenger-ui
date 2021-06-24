@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use RTippin\Messenger\Http\Controllers\ViewPortalController;
+use RTippin\MessengerUi\Http\Controllers\ViewPortalController;
 
 /*
 |--------------------------------------------------------------------------

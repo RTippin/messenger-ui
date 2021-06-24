@@ -5,6 +5,7 @@ namespace RTippin\MessengerUi;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use RTippin\MessengerUi\Commands\PublishCommand;
 
 class MessengerUiServiceProvider extends ServiceProvider
 {
@@ -16,6 +17,8 @@ class MessengerUiServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/messenger-ui.php', 'messenger-ui');
+
         $router = $this->app->make(Router::class);
 
         $router->group($this->webRouteConfiguration(), function () {
@@ -40,6 +43,10 @@ class MessengerUiServiceProvider extends ServiceProvider
      */
     private function bootForConsole(): void
     {
+        $this->commands([
+            PublishCommand::class,
+        ]);
+
         $this->publishes([
             __DIR__.'/../config/messenger-ui.php' => config_path('messenger-ui.php'),
         ], 'messenger-ui.config');
