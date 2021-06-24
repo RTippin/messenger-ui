@@ -11,6 +11,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Endpoint our javascript will use for socket.io
+    |--------------------------------------------------------------------------
+    |
+    */
+    'socket_endpoint' => env('MESSENGER_SOCKET_ENDPOINT', config('app.url')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Messenger-UI web routes config
     |--------------------------------------------------------------------------
     |
@@ -28,12 +36,4 @@ return [
         'middleware' => ['web', 'auth', 'messenger.provider'],
         'invite_middleware' => ['web', 'auth.optional', 'messenger.provider'],
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Endpoint our javascript will use for socket.io
-    |--------------------------------------------------------------------------
-    |
-    */
-    'socket_endpoint' => env('MESSENGER_SOCKET_ENDPOINT', config('app.url')),
 ];
