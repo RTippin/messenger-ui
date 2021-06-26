@@ -572,6 +572,9 @@ window.ThreadTemplates = (function () {
                 case 99:
                     icon = 'far fa-plus-square';
                 break;
+                case 100:
+                    icon = 'fas fa-robot';
+                break;
             }
             return '<div id="'+(modal === true ? 'modal_' : '')+'message_'+data.id+'" class="system-message alert-warning rounded py-1 w-100 text-center" ' +
                     'title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'"><i class="'+icon+'"></i> ' +
