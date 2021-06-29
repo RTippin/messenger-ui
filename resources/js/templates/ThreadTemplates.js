@@ -488,7 +488,8 @@ window.ThreadTemplates = (function () {
             return '<div id="message_'+data.id+'" class="message info"><a '+(data.owner.route ? '' : 'onclick="return false;"')+' ' +
                 'href="'+(data.owner.route ? data.owner.route : '#')+'" target="_blank"><img title="'+Messenger.format().escapeHtml(data.owner.name)+'" class="rounded-circle message-avatar" src="'+data.owner.avatar.sm+'"></a>' +
                 '<div class="message-body"><div class="message-body-inner"><div class="message-info">' +
-                '<h4>'+data.owner.name+'</h4><h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
+                '<h4>'+data.owner.name+(data.from_bot ? '<span class="badge badge-warning">BOT</span>' : '')+'</h4>' +
+                '<h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
                 templates.message_body(data, false) +
                 '</div></div></div>' +templates.message_options(data, false)+
                 '<div class="reactions">'+templates.message_reactions(data, false, false)+
@@ -506,7 +507,8 @@ window.ThreadTemplates = (function () {
             return '<div id="message_'+data.id+'" class="message info"><a '+(data.owner.route ? '' : 'onclick="return false;"')+' ' +
                 'href="'+(data.owner.route ? data.owner.route : '#')+'" target="_blank"><img title="'+Messenger.format().escapeHtml(data.owner.name)+'" class="rounded-circle message-avatar" src="'+data.owner.avatar.sm+'"></a>' +
                 '<div class="message-body '+templates.message_reply_highlight(data)+'"><div class="message-body-inner"><div class="message-info">' +
-                '<h4>'+data.owner.name+'</h4><h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
+                '<h4>'+data.owner.name+(data.from_bot ? '<span class="badge badge-warning">BOT</span>' : '')+'</h4>' +
+                '<h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
                 templates.message_reply_item(data) +
                 templates.message_body(data, false) +
                 '</div></div></div>' +templates.message_options(data, false)+
