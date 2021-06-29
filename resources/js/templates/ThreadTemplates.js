@@ -573,6 +573,9 @@ window.ThreadTemplates = (function () {
                     icon = 'far fa-plus-square';
                 break;
                 case 100:
+                case 101:
+                case 102:
+                case 103:
                     icon = 'fas fa-robot';
                 break;
             }
@@ -860,10 +863,12 @@ window.ThreadTemplates = (function () {
                 '        </table>\n' +
                 '    </div>\n' +
                 '    <hr>\n' +
-                '    <div class="form-group text-center">\n' +
-                '        <div data-toggle="tooltip" title="Edit Avatar" data-placement="right" onclick="ThreadManager.group().groupAvatar(\''+settings.avatar.sm+'\')" class="pointer_area d-inline">\n' +
-                '            <img alt="Group Image" height="50" class="rounded mr-2" src="'+settings.avatar.sm+'"/><span class="h4"> <i class="fas fa-edit"></i> Avatar</span>\n' +
-                '        </div>\n' +
+                '    <div class="form-group mb-0 py-2 alert-dark shadow rounded">\n' +
+                '    <div class="col-12">' +
+                '        <img alt="Avatar" height="62" width="62" class="mr-3 rounded avatar-is-offline" src="'+settings.avatar.sm+'"/>' +
+                '        <button onclick="$(\'#thread_avatar_image_file\').trigger(\'click\')" type="button" class="btn btn-sm btn-success mr-3"><i class="fas fa-image"></i> Upload Avatar</button>' +
+                '        <button onclick="ThreadManager.group().removeGroupAvatar()" type="button" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Remove Avatar</button>' +
+                '    </div></div>\n' +
                 '    </div>\n' +
                 '    <hr>\n' +
                 '    <div class="text-center form-group mb-0 py-2 alert-danger shadow rounded">\n' +
@@ -871,59 +876,6 @@ window.ThreadTemplates = (function () {
                 '        <button onclick="ThreadManager.archive().Thread()" type="button" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Remove Group</button>\n' +
                 '    </div>\n' +
                 '</form>'
-        },
-        group_avatar : function(img){
-            return '<div class="row">\n' +
-                '    <div class="text-center mx-auto">\n' +
-                '        <img alt="Group Image" class="rounded group-current-avatar" src="'+img+'"/>\n' +
-                '    </div>\n' +
-                '</div>\n' +
-                '<div class="row mt-2">\n' +
-                '    <div class="col-12 accordion_arrow text-dark" id="avatar_opts">\n' +
-                '        <div class="card bg-light mb-1">\n' +
-                '            <div class="card-header h4 pointer_area collapsed" data-toggle="collapse" data-target="#opt1">\n' +
-                '                <i class="fas fa-ellipsis-v"></i> Choose a default group avatar\n' +
-                '            </div>\n' +
-                '            <div id="opt1" class="collapse" data-parent="#avatar_opts">\n' +
-                '                <div class="card-body pb-2 h5 bg-light text-dark">\n' +
-                '                    <div class="col-12">\n' +
-                '                        <label class="control-label">Select default avatar:</label>\n' +
-                '                        <div id="default_avatar" class="form-row">\n' +
-                '                            <div class="row justify-content-center">' +
-                '                            <div class="col-4 col-md-3 grp-img-box"><label><img src="'+[window.location.protocol, '//', window.location.host].join('')+'/vendor/messenger/images/1.png" class="img-thumbnail grp-img-check grp-img-checked"><input type="radio" name="default_avatar" value="1.png" class="NS" autocomplete="off" checked></label></div>' +
-                '                            <div class="col-4 col-md-3 grp-img-box"><label><img src="'+[window.location.protocol, '//', window.location.host].join('')+'/vendor/messenger/images/2.png" class="img-thumbnail grp-img-check"><input type="radio" name="default_avatar" value="2.png" class="NS" autocomplete="off"></label></div>' +
-                '                            <div class="col-4 col-md-3 grp-img-box"><label><img src="'+[window.location.protocol, '//', window.location.host].join('')+'/vendor/messenger/images/3.png" class="img-thumbnail grp-img-check"><input type="radio" name="default_avatar" value="3.png" class="NS" autocomplete="off"></label></div>' +
-                '                            </div>'+
-                '                            <div class="row justify-content-center">' +
-                '                            <div class="col-4 col-md-3 grp-img-box"><label><img src="'+[window.location.protocol, '//', window.location.host].join('')+'/vendor/messenger/images/4.png" class="img-thumbnail grp-img-check"><input type="radio" name="default_avatar" value="4.png" class="NS" autocomplete="off"></label></div>' +
-                '                            <div class="col-4 col-md-3 grp-img-box"><label><img src="'+[window.location.protocol, '//', window.location.host].join('')+'/vendor/messenger/images/5.png" class="img-thumbnail grp-img-check"><input type="radio" name="default_avatar" value="5.png" class="NS" autocomplete="off"></label></div>' +
-                '                            </div>'+
-                '                        </div>\n' +
-                '                    </div>\n' +
-                '                    <div class="col-12 mt-2 text-center">\n' +
-                '                        <button id="avatar_default_btn" onclick="ThreadManager.group().updateGroupAvatar({action : \'default\'})" type="button" class="btn btn-lg btn-success"><i class="far fa-save"></i> Save</button>\n' +
-                '                    </div>\n' +
-                '                </div>\n' +
-                '            </div>\n' +
-                '        </div>\n' +
-                '        <div class="card bg-light mb-1">\n' +
-                '            <div class="card-header h4 pointer_area collapsed" data-toggle="collapse" data-target="#opt2">\n' +
-                '                <i class="fas fa-ellipsis-v"></i> Upload your own group avatar\n' +
-                '            </div>\n' +
-                '            <div id="opt2" class="collapse" data-parent="#avatar_opts">\n' +
-                '                <div class="card-body h5 bg-light text-dark">\n' +
-                '                    <h5 class="text-info">Select upload image to pick an avatar of your choosing:</h5>\n' +
-                '                    <div class="text-center">\n' +
-                '                        <button id="group_avatar_upload_btn" onclick="$(\'#avatar_image_file\').trigger(\'click\');" type="button" class="btn btn-lg btn-success"><i class="fas fa-cloud-upload-alt"></i> Upload Image</button>\n' +
-                '                    </div>\n' +
-                '                    <form class="NS" id="avatarUpload" enctype="multipart/form-data">\n' +
-                '                        <input id="avatar_image_file" type="file" name="avatar_image_file" accept="image/*">\n' +
-                '                    </form>\n' +
-                '                </div>\n' +
-                '            </div>\n' +
-                '        </div>\n' +
-                '    </div>\n' +
-                '</div>'
         },
         thread_generate_invite : function(back){
             return '<div id="grp_inv_make" class="row">\n' +
@@ -1378,6 +1330,7 @@ window.ThreadTemplates = (function () {
                 '                        </form>\n' +
                 '                    </div>\n' +
                 '                    <input class="NS" multiple type="file" name="doc_file" id="doc_file" accept=".csv,.doc,.docx,.json,.pdf,.ppt,.pptx,.rar,.rtf,.txt,.xls,.xlsx,.xml,.zip,.7z,.aac,.mp3,.oga,.wav,.weba,webm,image/*">\n' +
+                '                    <input class="NS" id="thread_avatar_image_file" type="file" name="group_avatar_image_file" accept="image/*">\n' +
                 '                </div>\n' +
                 '            </div>\n' +
                 '        </div>\n' +

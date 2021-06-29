@@ -74,6 +74,7 @@ window.ThreadManager = (function () {
             messenger_search_results : null,
             msg_panel : null,
             doc_file : null,
+            group_avatar_file : null,
             record_audio_message_btn : null,
             add_emoji_btn : null,
             data_table : null,
@@ -128,6 +129,7 @@ window.ThreadManager = (function () {
                 opt.elements.reply_message_alert = $("#reply_message_alert");
                 opt.elements.msg_panel = $(".chat-body");
                 opt.elements.doc_file = $("#doc_file");
+                opt.elements.group_avatar_file = $("#thread_avatar_image_file");
                 opt.elements.record_audio_message_btn = $("#record_audio_message_btn");
                 opt.elements.add_emoji_btn = $("#add_emoji_btn");
             }
@@ -289,6 +291,7 @@ window.ThreadManager = (function () {
                     messenger_search_results : null,
                     msg_panel : null,
                     doc_file : null,
+                    group_avatar_file : null,
                     record_audio_message_btn : null,
                     data_table : null,
                     message_text_input : null,
@@ -319,6 +322,7 @@ window.ThreadManager = (function () {
                     opt.elements.msg_panel.click(mounted.msgPanelClick);
                     opt.elements.msg_panel.scroll(mounted.msgPanelScroll);
                     opt.elements.doc_file.change(mounted.documentChange);
+                    opt.elements.group_avatar_file.change(mounted.uploadGroupAvatar);
                     opt.elements.record_audio_message_btn.click(mounted.audioMessage);
                     opt.elements.add_emoji_btn.click(mounted.showEmojiPicker);
                     opt.elements.message_text_input.on('paste', methods.pasteImage);
@@ -363,6 +367,7 @@ window.ThreadManager = (function () {
                         opt.elements.msg_panel.off('click', mounted.msgPanelClick);
                         opt.elements.msg_panel.off('scroll', mounted.msgPanelScroll);
                         opt.elements.doc_file.off('change', mounted.documentChange);
+                        opt.elements.group_avatar_file.off('change', mounted.uploadGroupAvatar);
                         opt.elements.record_audio_message_btn.off('click', mounted.audioMessage);
                         opt.elements.add_emoji_btn.off('click', mounted.showEmojiPicker);
                         opt.elements.message_text_input.off('paste', methods.pasteImage);
@@ -529,9 +534,8 @@ window.ThreadManager = (function () {
                 case 1:
                 case 2:
                     if(opt.thread.lockout || !opt.thread.messaging) return;
-                    let input = document.getElementById('doc_file'), files = input.files;
-                    ([...files]).forEach(methods.sendUploadFiles);
-                    input.value = '';
+                    ([...opt.elements.doc_file[0].files]).forEach(methods.sendUploadFiles);
+                    opt.elements.doc_file[0].value = '';
                 break;
                 case 3:
                     if(!opt.thread.messaging) return;
@@ -540,13 +544,21 @@ window.ThreadManager = (function () {
                 break;
             }
         },
-        avatarListener : function(){
-            $('.grp-img-check').click(function() {
-                $('.grp-img-check').not(this).removeClass('grp-img-checked').siblings('input').prop('checked',false);
-                $(this).addClass('grp-img-checked').siblings('input').prop('checked',true);
-            });
-            $("#avatar_image_file").change(function(){
-                groups.updateGroupAvatar({action : 'upload'});
+        uploadGroupAvatar : function(){
+            let data = new FormData();
+            data.append('image', opt.elements.group_avatar_file[0].files[0]);
+            Messenger.alert().fillModal({loader : true, no_close : true, body : null, title : 'Uploading...'});
+            Messenger.xhr().payload({
+                route : Messenger.common().API + 'threads/' + opt.thread.id + '/avatar',
+                data : data,
+                success : function(data){
+                    Messenger.alert().Alert({
+                        title : 'You updated '+data.name+'\'s Avatar.',
+                        toast : true
+                    });
+                },
+                close_modal : true,
+                fail_alert : true,
             });
         },
         switchToggleListener : function(){
@@ -2447,53 +2459,20 @@ window.ThreadManager = (function () {
                 close_modal : true
             }, 'put');
         },
-        groupAvatar : function(img){
-            Messenger.alert().Modal({
-                icon : 'image',
-                theme : 'dark',
-                centered : true,
-                backdrop_ctrl : false,
-                title: opt.thread.name+' Avatar',
-                body : ThreadTemplates.render().group_avatar(img),
-                h4: false,
-                unlock_buttons : false,
-                onReady: mounted.avatarListener
-            });
-        },
-        updateGroupAvatar : function(arg){
-            if(arg.action === 'upload'){
-                let data = new FormData();
-                data.append('image', $('#avatar_image_file')[0].files[0]);
-                Messenger.button().addLoader({id : '#group_avatar_upload_btn'});
-                Messenger.xhr().payload({
-                    route : Messenger.common().API + 'threads/' + opt.thread.id + '/avatar',
-                    data : data,
-                    success : function(data){
-                        Messenger.alert().Alert({
-                            title : 'You updated '+data.name+'\'s Avatar.',
-                            toast : true
-                        });
-                    },
-                    fail_alert : true,
-                    close_modal : true
-                });
-                return;
-            }
-            Messenger.button().addLoader({id : '#avatar_default_btn'});
+        removeGroupAvatar : function(){
+            Messenger.alert().fillModal({loader : true, no_close : true, body : null, title : 'Uploading...'});
             Messenger.xhr().payload({
                 route : Messenger.common().API + 'threads/' + opt.thread.id + '/avatar',
-                data : {
-                    default : $('#default_avatar input[type="radio"]:checked').val()
-                },
+                data : {},
                 success : function(data){
                     Messenger.alert().Alert({
-                        title : 'You updated '+data.name+'\'s Avatar.',
+                        title : 'You removed '+data.name+'\'s avatar.',
                         toast : true
                     });
                 },
+                close_modal : true,
                 fail_alert : true,
-                close_modal : true
-            });
+            }, 'delete');
         },
         removeParticipant : function(x){
             if(opt.states.lock) return;
@@ -2662,7 +2641,7 @@ window.ThreadManager = (function () {
             let form = new FormData(),
                 message_contents = opt.elements.message_text_input.val();
             if(isFile === true){
-                let file = $('#doc_file')[0].files[0];
+                let file = opt.elements.doc_file[0].files[0];
                 let type = methods.sendUploadFiles(file, true);
                 form.append(type, file);
             } else if(voiceMessage === true) {

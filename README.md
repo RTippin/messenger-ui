@@ -19,6 +19,10 @@ $ composer require rtippin/messenger-ui
 ```bash
 $ php artisan messenger:ui:publish
 ```
+- To update only our compiled assets, run:
+```bash
+$ php artisan vendor:publish --tag=messenger-ui.assets --force
+```
 
 # Config
 
