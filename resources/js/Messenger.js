@@ -10,7 +10,9 @@ window.Messenger = (function () {
         lockout : false,
         model : 'guest',
         auth : false,
-        id : ''+(Math.floor(Math.random() * 90000) + 10000)+'',
+        provider_id : null,
+        provider_alias : null,
+        provider_model : 'guest',
         name : 'Guest User',
         slug : '#',
         avatar_md : null,
@@ -31,9 +33,10 @@ window.Messenger = (function () {
             if(opt.initialized) return;
             opt.initialized = true;
             if("provider" in arg){
-                opt.model = arg.provider.model;
+                opt.provider_id = arg.provider.id;
+                opt.provider_alias = arg.provider.alias;
+                opt.provider_model = arg.provider.model;
                 opt.auth = true;
-                opt.id = arg.provider.id;
                 opt.name = arg.provider.name;
                 opt.slug = arg.provider.slug;
                 opt.avatar_md = arg.provider.avatar_md;
@@ -111,6 +114,14 @@ window.Messenger = (function () {
                 window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
                 document.querySelector('meta[name=csrf-token]').content = token
             }
+        },
+        isProvider : function(id, model, alias){
+            if(model === null){
+                return opt.provider_id === id
+                    && opt.provider_alias === alias;
+            }
+            return opt.provider_id === id
+                && opt.provider_model === model;
         }
     },
     format = {
@@ -663,7 +674,7 @@ window.Messenger = (function () {
             opt.slug = slug;
         },
         Logout : function(){
-            if(opt.model === 'guest') return;
+            if(opt.provider_model === 'guest') return;
             Messenger.alert().Modal({
                 size : 'sm',
                 icon : 'sign-out-alt',
@@ -691,14 +702,16 @@ window.Messenger = (function () {
     };
     return {
         init : methods.Initialize,
+        isProvider : methods.isProvider,
         common : function(){
             return {
                 APP_NAME : opt.APP_NAME,
                 API : opt.API,
                 WEB : opt.WEB,
                 SOCKET : opt.SOCKET,
-                model : opt.model,
-                id : opt.id,
+                provider_alias : opt.provider_alias,
+                provider_id : opt.provider_id,
+                provider_model : opt.provider_model,
                 name : opt.name,
                 slug : opt.slug,
                 avatar_md : opt.avatar_md,

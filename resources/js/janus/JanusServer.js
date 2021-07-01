@@ -67,7 +67,7 @@ window.JanusServer = (function () {
             opt.server.main = CallManager.state().janus_main;
             opt.server.ice = CallManager.state().janus_ice;
             opt.storage.display = {
-                id : Messenger.common().id,
+                id : Messenger.common().provider_id,
                 name : Messenger.common().name,
                 avatar : Messenger.common().avatar_md
             };
@@ -141,7 +141,7 @@ window.JanusServer = (function () {
             opt.empty_room.show();
             opt.server.JANUS = new Janus({
                 server : opt.server.main,
-                opaqueId : Messenger.common().id,
+                opaqueId : Messenger.common().provider_id,
                 apisecret : opt.server.api_secret,
                 iceServers : opt.server.ice,
                 success : Attach.myself,
@@ -742,7 +742,7 @@ window.JanusServer = (function () {
             if(opt.server.call_socket){
                 opt.server.call_socket.whisper('screen_share_started', {
                     name : Messenger.common().name,
-                    owner_id : Messenger.common().id,
+                    owner_id : Messenger.common().provider_id,
                     janus_id : opt.storage.my_janus_id
                 });
             }
@@ -770,7 +770,7 @@ window.JanusServer = (function () {
             if(opt.server.call_socket){
                 opt.server.call_socket.whisper('screen_share_ended', {
                     name : Messenger.common().name,
-                    owner_id : Messenger.common().id,
+                    owner_id : Messenger.common().provider_id,
                     janus_id : opt.storage.my_janus_id
                 });
             }

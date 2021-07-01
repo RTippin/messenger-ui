@@ -400,8 +400,7 @@ window.ThreadTemplates = (function () {
                 for(const reaction in message.reactions.data){
                     if(message.reactions.data.hasOwnProperty(reaction)){
                         let reactedByMe = message.reactions.data[reaction].find(function(reactors){
-                            return reactors.owner.provider_id === Messenger.common().id
-                                && reactors.owner.provider_alias === Messenger.common().model;
+                            return Messenger.isProvider(reactors.owner_id, reactors.owner_type);
                         });
                         let names = '';
                         let reactionCount = message.reactions.data[reaction].length;
@@ -449,7 +448,7 @@ window.ThreadTemplates = (function () {
                     html += '<div class="row mr-1"><div class="col-4 text-center p-0 my-1">'+methods.format_message_body(reaction, true)+'</div><div class="col-8 p-0"><ul class="list-unstyled mb-1">';
                     data.data[reaction].forEach(function (reactor) {
                         html += '<li class="thread_list_item" id="react_li_item_'+reactor.id+'"><div class="d-inline"><img height="20" width="20" class="rounded-circle" src="'+reactor.owner.avatar.sm+'"/> '+reactor.owner.name+'</div>'+
-                            ((ThreadManager.state().thread_admin || (reactor.owner.provider_id === Messenger.common().id && reactor.owner.provider_alias === Messenger.common().model))
+                            ((ThreadManager.state().thread_admin || Messenger.isProvider(reactor.owner_id, reactor.owner_type))
                                 ? '<div onclick="ThreadManager.removeReaction({message_id : \''+reactor.message_id+'\', id : \''+reactor.id+'\'}, true)" class="float-right h6 pointer_area mt-0 mr-1 text-danger"><i title="Remove" class="fas fa-times"></i></div>'
                                 : '')+
                             '</li><div class="clearfix"></div>'
@@ -525,7 +524,7 @@ window.ThreadTemplates = (function () {
         message_reply_highlight : function(data){
             return data.hasOwnProperty('reply_to')
                 && data.reply_to !== null
-                && data.reply_to.owner_id === Messenger.common().id
+                && Messenger.isProvider(data.reply_to.owner_id, data.reply_to.owner_type)
                 ? 'message-reply-highlight'
                 : '';
         },
@@ -652,7 +651,8 @@ window.ThreadTemplates = (function () {
                 '<div class="dropdown-divider"></div>\n';
         },
         thread_network_opt : function(data){
-            if(data.provider_id !== Messenger.common().id && data.options.friendable
+            if(!Messenger.isProvider(data.provider_id, null, data.provider_alias)
+                && data.options.friendable
                 && (data.options.can_friend || data.options.friend_status !== 0))
             {
                 switch(data.options.friend_status){
@@ -1084,7 +1084,7 @@ window.ThreadTemplates = (function () {
             };
             if(participants && participants.length){
                 participants.forEach((participant) => {
-                    if(participant.owner.provider_id !== Messenger.common().id){
+                    if(!Messenger.isProvider(participant.owner_id, participant.owner_type)){
                         table_fill += participant_fill(participant)
                     }
                 })

@@ -588,7 +588,7 @@ window.ThreadManager = (function () {
                 opt.storage.active_profiles = [];
                 $('.thread_error_area').hide();
                 $.each(users, function() {
-                    if(this.provider_id !== Messenger.common().id){
+                    if(!Messenger.isProvider(this.provider_id, null, this.provider_alias)){
                         opt.storage.active_profiles.push(this);
                         methods.updateBobbleHead(this.provider_id, null)
                     }
@@ -734,7 +734,7 @@ window.ThreadManager = (function () {
                 return;
             }
             methods.updateThread(data, false, false, true);
-            if(Messenger.common().id !== data.owner_id) NotifyManager.sound('message')
+            if(!Messenger.isProvider(data.owner_id, data.owner_type)) NotifyManager.sound('message')
         },
         audioMessage : function(audio){
             if(opt.thread.id){
@@ -932,7 +932,7 @@ window.ThreadManager = (function () {
             }
         },
         groupSettingsState : function(settings){
-            if(Messenger.common().id !== settings.sender.provider_id){
+            if(!Messenger.isProvider(settings.sender.provider_id, null, settings.sender.provider_alias)){
                 NotifyManager.sound('notify');
                 Messenger.alert().Alert({
                     title : settings.sender.name+' updated the groups settings. Refreshing the group...',
@@ -943,7 +943,7 @@ window.ThreadManager = (function () {
             LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
         },
         groupAvatarState : function(settings){
-            if(Messenger.common().id !== settings.sender.provider_id){
+            if(!Messenger.isProvider(settings.sender.provider_id, null, settings.sender.provider_alias)){
                 NotifyManager.sound('notify');
                 Messenger.alert().Alert({
                     title : settings.sender.name+' updated the groups avatar. Refreshing the group...',
@@ -1082,7 +1082,7 @@ window.ThreadManager = (function () {
         drawBobbleHeads : function(){
             if(!opt.storage.participants.length || !opt.storage.messages.length) return;
             opt.storage.participants.forEach(function(value){
-                if(value.owner_id === Messenger.common().id || !value.last_read.message_id || ('added' in value && value.added)) return;
+                if(Messenger.isProvider(value.owner_id, value.owner_type) || !value.last_read.message_id || ('added' in value && value.added)) return;
                 $(".bobble_head_"+value.owner_id).remove();
                 let message = $("#message_"+value.last_read.message_id);
                 if((value.caught_up && value.typing) || (opt.storage.messages[0].id === value.last_read.message_id)){
@@ -1198,9 +1198,10 @@ window.ThreadManager = (function () {
                     messages_html += ThreadTemplates.render().system_message(value);
                     return;
                 }
-                if(value.owner_id === Messenger.common().id){
+                if(Messenger.isProvider(value.owner_id, value.owner_type)){
                     if(key !== 0
                         && opt.storage.messages[key-1].owner_id === value.owner_id
+                        && opt.storage.messages[key-1].owner_type === value.owner_type
                         && ! opt.storage.messages[key-1].system_message
                         && ! value.hasOwnProperty('reply_to')
                         && Messenger.format().timeDiffInUnit(value.created_at, opt.storage.messages[key-1].created_at, 'minutes') < 30
@@ -1217,6 +1218,7 @@ window.ThreadManager = (function () {
                 }
                 if(key !== 0
                     && opt.storage.messages[key-1].owner_id === value.owner_id
+                    && opt.storage.messages[key-1].owner_type === value.owner_type
                     && ! opt.storage.messages[key-1].system_message
                     && ! value.hasOwnProperty('reply_to')
                     && Messenger.format().timeDiffInUnit(value.created_at, opt.storage.messages[key-1].created_at, 'minutes') < 30
@@ -1255,9 +1257,10 @@ window.ThreadManager = (function () {
                     messages_html += ThreadTemplates.render().system_message(value);
                     return;
                 }
-                if(value.owner_id === Messenger.common().id){
+                if(Messenger.isProvider(value.owner_id, value.owner_type)){
                     if(key !== 0
                         && messages[key-1].owner_id === value.owner_id
+                        && messages[key-1].owner_type === value.owner_type
                         && ! messages[key-1].system_message
                         && ! value.hasOwnProperty('reply_to')
                         && Messenger.format().timeDiffInUnit(value.created_at, messages[key-1].created_at, 'minutes') < 30
@@ -1274,6 +1277,7 @@ window.ThreadManager = (function () {
                 }
                 if(key !== 0
                     && messages[key-1].owner_id === value.owner_id
+                    && messages[key-1].owner_type === value.owner_type
                     && ! messages[key-1].system_message
                     && ! value.hasOwnProperty('reply_to')
                     && Messenger.format().timeDiffInUnit(value.created_at, messages[key-1].created_at, 'minutes') < 30
@@ -1294,9 +1298,10 @@ window.ThreadManager = (function () {
                 && ! messages[messages.length-1].system_message
                 && ! last_message.hasOwnProperty('reply_to')
                 && ! messages[messages.length-1].hasOwnProperty('reply_to')
-                && messages[messages.length-1].owner_id === last_message.owner_id)
+                && messages[messages.length-1].owner_id === last_message.owner_id
+                && messages[messages.length-1].owner_type === last_message.owner_type)
             {
-                let replace_html = last_message.owner_id === Messenger.common().id
+                let replace_html = Messenger.isProvider(last_message.owner_id, last_message.owner_type)
                     ? ThreadTemplates.render().my_message_grouped(last_message)
                     : ThreadTemplates.render().message_grouped(last_message);
                 opt.elements.msg_stack.find("#message_"+last_message.id).replaceWith(replace_html)
@@ -1384,8 +1389,8 @@ window.ThreadManager = (function () {
             if(opt.socket.online_status_setting === 1 && opt.storage.active_profiles.length && opt.socket.chat && ((time.getTime() - opt.socket.send_typing) / 1000) > 1.5){
                 opt.socket.send_typing = time.getTime();
                 opt.socket.chat.whisper('typing', {
-                    provider_id: Messenger.common().id,
-                    provider_alias : Messenger.common().model,
+                    provider_id: Messenger.common().provider_id,
+                    provider_alias : Messenger.common().provider_alias,
                     name: Messenger.common().name,
                     typing: true
                 });
@@ -1395,8 +1400,8 @@ window.ThreadManager = (function () {
             if(opt.socket.online_status_setting === 1 && opt.storage.active_profiles.length && opt.socket.chat && opt.socket.send_typing > 0){
                 opt.socket.send_typing = 0;
                 opt.socket.chat.whisper('typing', {
-                    provider_id: Messenger.common().id,
-                    provider_alias : Messenger.common().model,
+                    provider_id: Messenger.common().provider_id,
+                    provider_alias : Messenger.common().provider_alias,
                     name: Messenger.common().name,
                     typing: false
                 });
@@ -1405,8 +1410,8 @@ window.ThreadManager = (function () {
         seenMessage : function(message){
             if(opt.storage.active_profiles.length && opt.socket.chat){
                 opt.socket.chat.whisper('read', {
-                    provider_id: Messenger.common().id,
-                    provider_alias : Messenger.common().model,
+                    provider_id: Messenger.common().provider_id,
+                    provider_alias : Messenger.common().provider_alias,
                     message_id : message
                 });
             }
@@ -1414,8 +1419,8 @@ window.ThreadManager = (function () {
         sendOnlineStatus : function(status){
             if(!opt.storage.active_profiles.length || !opt.socket.chat) return;
             opt.socket.chat.whisper('online', {
-                provider_id: Messenger.common().id,
-                provider_alias : Messenger.common().model,
+                provider_id: Messenger.common().provider_id,
+                provider_alias : Messenger.common().provider_alias,
                 name: Messenger.common().name,
                 online_status: (opt.socket.online_status_setting !== 0 ? status : 0)
             })
@@ -1593,14 +1598,15 @@ window.ThreadManager = (function () {
                 body : body ? Messenger.format().escapeHtml(body) : null,
                 id : uuid.v4(),
                 type : type,
-                owner_id : Messenger.common().id,
+                owner_id : Messenger.common().provider_id,
+                owner_type : Messenger.common().provider_model,
                 thread_id : opt.thread.id,
             }
         },
         addPendingMessage : function(message){
             if(opt.storage.pending_messages.length > 1 ||
                 (opt.storage.messages.length > 1
-                && opt.storage.messages[0].owner_id === Messenger.common().id
+                && Messenger.isProvider(opt.storage.messages[0].owner_id, opt.storage.messages[0].owner_type)
                 && ! opt.storage.messages[0].system_message)
             ){
                 opt.elements.pending_msg_stack.append(ThreadTemplates.render().pending_message_grouped(message));
@@ -1686,17 +1692,18 @@ window.ThreadManager = (function () {
                 opt.elements.msg_stack.append(ThreadTemplates.render().system_message(msg));
             }
             else if(msg.hasOwnProperty('reply_to')){
-                msg.owner_id === Messenger.common().id ? opt.elements.msg_stack.append(ThreadTemplates.render().my_message_reply(msg)) : opt.elements.msg_stack.append(ThreadTemplates.render().message_reply(msg));
+                Messenger.isProvider(msg.owner_id, msg.owner_type) ? opt.elements.msg_stack.append(ThreadTemplates.render().my_message_reply(msg)) : opt.elements.msg_stack.append(ThreadTemplates.render().message_reply(msg));
             }
             else if(opt.storage.messages.length > 1
                 && opt.storage.messages[1].owner_id === msg.owner_id
+                && opt.storage.messages[1].owner_type === msg.owner_type
                 && ! opt.storage.messages[1].system_message
                 && Messenger.format().timeDiffInUnit(msg.created_at, opt.storage.messages[1].created_at, 'minutes') < 30
             ){
-                msg.owner_id === Messenger.common().id ? opt.elements.msg_stack.append(ThreadTemplates.render().my_message_grouped(msg)) : opt.elements.msg_stack.append(ThreadTemplates.render().message_grouped(msg));
+                Messenger.isProvider(msg.owner_id, msg.owner_type) ? opt.elements.msg_stack.append(ThreadTemplates.render().my_message_grouped(msg)) : opt.elements.msg_stack.append(ThreadTemplates.render().message_grouped(msg));
             }
             else{
-                msg.owner_id === Messenger.common().id ? opt.elements.msg_stack.append(ThreadTemplates.render().my_message(msg)) : opt.elements.msg_stack.append(ThreadTemplates.render().message(msg));
+                Messenger.isProvider(msg.owner_id, msg.owner_type) ? opt.elements.msg_stack.append(ThreadTemplates.render().my_message(msg)) : opt.elements.msg_stack.append(ThreadTemplates.render().message(msg));
             }
             methods.messageStatusState(msg, true);
             methods.drawBobbleHeads();
@@ -1707,7 +1714,7 @@ window.ThreadManager = (function () {
         },
         messageStatusState : function(message, sound){
             opt.thread.click_to_read = false;
-            let didScroll = methods.threadScrollBottom(message.owner_id === Messenger.common().id, false),
+            let didScroll = methods.threadScrollBottom(Messenger.isProvider(message.owner_id, message.owner_type), false),
             hide = function () {
                 opt.elements.new_msg_alert.hide();
                 opt.thread.messages_unread = false;
@@ -1716,9 +1723,9 @@ window.ThreadManager = (function () {
             methods.imageLoadListener(didScroll);
             if(didScroll && document.hasFocus() && (!opt.socket.is_away || (opt.socket.is_away && opt.socket.online_status_setting === 2))){
                 hide();
-                if(message.owner_id !== Messenger.common().id || ![0,1,2].includes(message.type)) methods.markRead()
+                if(!Messenger.isProvider(message.owner_id, message.owner_type) || ![0,1,2].includes(message.type)) methods.markRead()
             }
-            else if(message.owner_id === Messenger.common().id){
+            else if(Messenger.isProvider(message.owner_id, message.owner_type)){
                 if(![0,1,2].includes(message.type)) methods.markRead();
                 hide();
             }
@@ -1836,14 +1843,14 @@ window.ThreadManager = (function () {
             opt.storage.threads.splice(the_thread.index, 1);
             temp.resources.latest_message = data;
             temp.updated_at = data.created_at;
-            if(temp.type === 1 && data.thread_id !== opt.thread.id && data.owner_id !== Messenger.common().id) temp.resources.recipient.options.online_status = 1;
-            if(temp.type === 1 && data.thread_id === opt.thread.id && data.owner_id !== Messenger.common().id){
+            if(temp.type === 1 && data.thread_id !== opt.thread.id && !Messenger.isProvider(data.owner_id, data.owner_type)) temp.resources.recipient.options.online_status = 1;
+            if(temp.type === 1 && data.thread_id === opt.thread.id && !Messenger.isProvider(data.owner_id, data.owner_type)){
                 let bobble = methods.locateStorageItem({type : 'bobble', id : data.owner_id}), i = bobble.index;
                 if(bobble.found){
                     temp.resources.recipient.options.online_status = opt.storage.participants[i].owner.options.online_status;
                 }
             }
-            if(data.owner_id === Messenger.common().id){
+            if(Messenger.isProvider(data.owner_id, data.owner_type)){
                 temp.unread = false;
                 temp.unread_count = 0;
             }
@@ -1941,7 +1948,7 @@ window.ThreadManager = (function () {
         editMessage : function(arg){
             if(!opt.thread.id) return;
             let messageStorage = methods.locateStorageItem({type : 'message', id : arg.id}), i = messageStorage.index, msg = $("#message_"+arg.id);
-            if (messageStorage.found && opt.storage.messages[i].owner_id === Messenger.common().id){
+            if (messageStorage.found && Messenger.isProvider(opt.storage.messages[i].owner_id, opt.storage.messages[i].owner_type)){
                 msg.find('.message-body').addClass('shadow-success');
                 Messenger.alert().Modal({
                     icon : 'edit',
@@ -2012,7 +2019,7 @@ window.ThreadManager = (function () {
             }, 'put');
         },
         renderUpdatedMessage : function(message, force){
-            if(force === true && message.owner_id === Messenger.common().id){
+            if(force === true && Messenger.isProvider(message.owner_id, message.owner_type)){
                 return;
             }
             let msg = $("#message_"+message.id), messageStorage = methods.locateStorageItem({type : 'message', id : message.id}), i = messageStorage.index;
@@ -2021,7 +2028,7 @@ window.ThreadManager = (function () {
             }
             if(msg.length){
                 if(message.hasOwnProperty('reply_to')){
-                    msg.replaceWith(message.owner_id === Messenger.common().id ? ThreadTemplates.render().my_message_reply(message) : ThreadTemplates.render().message_reply(message))
+                    msg.replaceWith(Messenger.isProvider(message.owner_id, message.owner_type) ? ThreadTemplates.render().my_message_reply(message) : ThreadTemplates.render().message_reply(message))
                 }
                 else{
                     msg.find('.message-text').html(ThreadTemplates.render().message_body(message))
@@ -3055,7 +3062,7 @@ window.ThreadManager = (function () {
                     }
                     if(opt.thread.type === 1 && opt.storage.participants.length){
                         for(let i = 0; i < opt.storage.participants.length; i++) {
-                            if (opt.storage.participants[i].owner_id !== Messenger.common().id) {
+                            if (!Messenger.isProvider(opt.storage.participants[i].owner_id, opt.storage.participants[i].owner_type)) {
                                 methods.threadOnlineStatus(opt.storage.participants[i].owner.options.online_status);
                             }
                         }

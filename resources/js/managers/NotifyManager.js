@@ -155,7 +155,7 @@ window.NotifyManager = (function () {
             });
             opt.socket.Echo.connector.socket.on('connect', function(){
                 opt.socket.socket_status = true;
-                broadcaster.PrivateChannel(Messenger.common().id);
+                broadcaster.PrivateChannel();
                 if(reconnected) broadcaster.reconnected(true)
             });
             opt.socket.Echo.connector.socket.on('reconnect', broadcaster.reconnected);
@@ -195,13 +195,13 @@ window.NotifyManager = (function () {
             opt.socket.forced_disconnect = true;
             opt.socket.socket_status = false;
         },
-        PrivateChannel : function(id){
+        PrivateChannel : function(){
             if(!opt.socket.Echo) return;
-            if(typeof opt.socket.Echo.connector.channels['private-messenger.'+Messenger.common().model+'.'+id] !== 'undefined'){
-                opt.socket.private_channel = opt.socket.Echo.connector.channels['private-messenger.'+Messenger.common().model+'.'+id];
+            if(typeof opt.socket.Echo.connector.channels['private-messenger.'+Messenger.common().provider_alias+'.'+Messenger.common().provider_id] !== 'undefined'){
+                opt.socket.private_channel = opt.socket.Echo.connector.channels['private-messenger.'+Messenger.common().provider_alias+'.'+id];
                 return;
             }
-            opt.socket.private_channel = opt.socket.Echo.private('messenger.'+Messenger.common().model+'.'+id);
+            opt.socket.private_channel = opt.socket.Echo.private('messenger.'+Messenger.common().provider_alias+'.'+Messenger.common().provider_id);
             opt.socket.private_channel.listen('.new.message', methods.incomingMessage)
             .listen('.thread.archived', methods.threadLeft)
             .listen('.message.archived', methods.messagePurged)
@@ -332,7 +332,7 @@ window.NotifyManager = (function () {
             let runTitle = function(){
                 methods.togglePageTitle(data.owner.name+' says...');
             },
-            myself = Messenger.common().id === data.owner_id;
+            myself = Messenger.isProvider(data.owner_id, data.owner_type);
             if(Messenger.common().modules.includes('ThreadManager')){
                 ThreadManager.Import().newMessage(data);
                 if(!myself) runTitle();

@@ -207,7 +207,7 @@ window.CallManager = (function () {
                 opt.active_profiles = [];
                 opt.channel_status = true;
                 $.each(users, function() {
-                    if(this.provider_id !== Messenger.common().id){
+                    if(!Messenger.isProvider(this.provider_id, null, this.provider_alias)){
                         opt.active_profiles.push({
                             owner_id : this.provider_id,
                             avatar : this.avatar.sm,
