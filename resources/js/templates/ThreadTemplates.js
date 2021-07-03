@@ -428,13 +428,14 @@ window.ThreadTemplates = (function () {
                             }
                         }
                         names += ' reacted with '+reaction;
+                        let tooltip = Messenger.format().escapeHtml('<div class="row my-2 mr-2"><div class="col-3">'+Messenger.format().shortcodeToImage(reaction)+'</div><div class="col-9">'+names+'</div></div>');
                         if(reactedByMe){
-                            html += '<span data-toggle="tooltip" title="'+names+'" data-placement="top" onclick="ThreadManager.removeReaction({message_id : \''+message.id+'\', id : \''+reactedByMe.id+'\'})" ' +
-                                'class="reaction-badge reacted-by-me badge badge-light px-1 pointer_area">'+methods.format_message_body(reaction, true)+
+                            html += '<span data-toggle="tooltip" data-html="true" title="'+tooltip+'" data-placement="top" onclick="ThreadManager.removeReaction({message_id : \''+message.id+'\', id : \''+reactedByMe.id+'\'})" ' +
+                                ' class="reaction-badge reacted-by-me badge badge-light px-1 pointer_area">'+methods.format_message_body(reaction, true)+
                                 '<span class="ml-1 font-weight-bold text-primary">'+message.reactions.data[reaction].length+'</span></span>';
                         } else {
-                            html += '<span data-toggle="tooltip" title="'+names+'" data-placement="top" onclick="ThreadManager.addNewReaction({message_id : \''+message.id+'\', emoji : \''+reaction+'\'})"' +
-                                'class="reaction-badge badge badge-light px-1 pointer_area">'+methods.format_message_body(reaction, true)+
+                            html += '<span data-toggle="tooltip" data-html="true" title="'+tooltip+'" data-placement="top" onclick="ThreadManager.addNewReaction({message_id : \''+message.id+'\', emoji : \''+reaction+'\'})"' +
+                                ' class="reaction-badge badge badge-light px-1 pointer_area">'+methods.format_message_body(reaction, true)+
                                 '<span class="ml-1 font-weight-bold">'+message.reactions.data[reaction].length+'</span></span>';
                         }
                     }
