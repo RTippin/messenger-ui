@@ -16,6 +16,7 @@ window.Messenger = (function () {
         name : 'Guest User',
         slug : '#',
         avatar_md : null,
+        avatar_sm : null,
         mobile : false,
         teapot : 0,
         modal_close : null,
@@ -40,6 +41,7 @@ window.Messenger = (function () {
                 opt.name = arg.provider.name;
                 opt.slug = arg.provider.slug;
                 opt.avatar_md = arg.provider.avatar_md;
+                opt.avatar_sm = arg.provider.avatar_sm;
             }
             if("common" in arg){
                 opt.API = arg.common.api_endpoint + '/';
@@ -116,6 +118,7 @@ window.Messenger = (function () {
             }
         },
         isProvider : function(id, model, alias){
+            alias = alias || null;
             if(model === null){
                 return opt.provider_id === id
                     && opt.provider_alias === alias;
@@ -715,6 +718,7 @@ window.Messenger = (function () {
                 name : opt.name,
                 slug : opt.slug,
                 avatar_md : opt.avatar_md,
+                avatar_sm : opt.avatar_sm,
                 modules : opt.modules,
                 mobile : opt.mobile,
                 csrf_token: opt.csrf_token,

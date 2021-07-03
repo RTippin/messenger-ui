@@ -89,6 +89,11 @@ window.ThreadTemplates = (function () {
                 'title="'+((data.typing || bottom) && data.owner.options.online_status === 1 && data.in_chat ? Messenger.format().escapeHtml(data.owner.name) : "Seen by "+Messenger.format().escapeHtml(data.owner.name))+'" />' +
                 '<div class="d-inline bobble-typing">'+(data.typing ? templates.typing_elipsis(data.owner_id) : '')+'</div></div>';
         },
+        bot_bobble_head : function(bot){
+            return '<div class="bobble-head-item d-inline bobble_head_'+bot.id+'"><img class="rounded-circle bobble-image" src="'+bot.avatar+'" ' +
+                'title="'+Messenger.format().escapeHtml(bot.name)+'" />' +
+                '<div class="d-inline bobble-typing">'+templates.typing_elipsis(bot.id)+'</div></div>';
+        },
         typing_elipsis : function(id){
             return '<div id="typing_'+id+'" class="typing-ellipsis"><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div></div>'
         },
@@ -423,13 +428,14 @@ window.ThreadTemplates = (function () {
                             }
                         }
                         names += ' reacted with '+reaction;
+                        let tooltip = Messenger.format().escapeHtml('<div class="row my-2 mr-2"><div class="col-3">'+Messenger.format().shortcodeToImage(reaction)+'</div><div class="col-9">'+names+'</div></div>');
                         if(reactedByMe){
-                            html += '<span data-toggle="tooltip" title="'+names+'" data-placement="top" onclick="ThreadManager.removeReaction({message_id : \''+message.id+'\', id : \''+reactedByMe.id+'\'})" ' +
-                                'class="reaction-badge reacted-by-me badge badge-light px-1 pointer_area">'+methods.format_message_body(reaction, true)+
+                            html += '<span data-toggle="tooltip" data-html="true" title="'+tooltip+'" data-placement="top" onclick="ThreadManager.removeReaction({message_id : \''+message.id+'\', id : \''+reactedByMe.id+'\'})" ' +
+                                ' class="reaction-badge reacted-by-me badge badge-light px-1 pointer_area">'+methods.format_message_body(reaction, true)+
                                 '<span class="ml-1 font-weight-bold text-primary">'+message.reactions.data[reaction].length+'</span></span>';
                         } else {
-                            html += '<span data-toggle="tooltip" title="'+names+'" data-placement="top" onclick="ThreadManager.addNewReaction({message_id : \''+message.id+'\', emoji : \''+reaction+'\'})"' +
-                                'class="reaction-badge badge badge-light px-1 pointer_area">'+methods.format_message_body(reaction, true)+
+                            html += '<span data-toggle="tooltip" data-html="true" title="'+tooltip+'" data-placement="top" onclick="ThreadManager.addNewReaction({message_id : \''+message.id+'\', emoji : \''+reaction+'\'})"' +
+                                ' class="reaction-badge badge badge-light px-1 pointer_area">'+methods.format_message_body(reaction, true)+
                                 '<span class="ml-1 font-weight-bold">'+message.reactions.data[reaction].length+'</span></span>';
                         }
                     }
