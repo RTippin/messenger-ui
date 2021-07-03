@@ -89,6 +89,11 @@ window.ThreadTemplates = (function () {
                 'title="'+((data.typing || bottom) && data.owner.options.online_status === 1 && data.in_chat ? Messenger.format().escapeHtml(data.owner.name) : "Seen by "+Messenger.format().escapeHtml(data.owner.name))+'" />' +
                 '<div class="d-inline bobble-typing">'+(data.typing ? templates.typing_elipsis(data.owner_id) : '')+'</div></div>';
         },
+        bot_bobble_head : function(bot){
+            return '<div class="bobble-head-item d-inline bobble_head_'+bot.id+'"><img class="rounded-circle bobble-image" src="'+bot.avatar+'" ' +
+                'title="'+Messenger.format().escapeHtml(bot.name)+'" />' +
+                '<div class="d-inline bobble-typing">'+templates.typing_elipsis(bot.id)+'</div></div>';
+        },
         typing_elipsis : function(id){
             return '<div id="typing_'+id+'" class="typing-ellipsis"><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div></div>'
         },
