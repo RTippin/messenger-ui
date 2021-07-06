@@ -86,13 +86,13 @@ window.ThreadTemplates = (function () {
         },
         bobble_head : function(data, bottom){
             return '<div class="bobble-head-item d-inline bobble_head_'+data.owner_id+'"><img class="rounded-circle bobble-image '+(bottom && (!data.in_chat || [0,2].includes(data.owner.options.online_status)) ? "bobble-image-away" : "")+'" src="'+data.owner.avatar.sm+'" ' +
-                'title="'+((data.typing || bottom) && data.owner.options.online_status === 1 && data.in_chat ? Messenger.format().escapeHtml(data.owner.name) : "Seen by "+Messenger.format().escapeHtml(data.owner.name))+'" />' +
+                'title="'+((data.typing || bottom) ? Messenger.format().escapeHtml(data.owner.name) : "Seen by "+Messenger.format().escapeHtml(data.owner.name))+'" />' +
                 '<div class="d-inline bobble-typing">'+(data.typing ? templates.typing_elipsis(data.owner_id) : '')+'</div></div>';
         },
-        bot_bobble_head : function(bot){
-            return '<div class="bobble-head-item d-inline bobble_head_'+bot.id+'"><img class="rounded-circle bobble-image" src="'+bot.avatar+'" ' +
+        bot_typing_bobble_head : function(bot){
+            return '<div class="bobble-head-item bot-bobble-head d-inline bot_typing_bobble_head_'+bot.id+'"><img class="rounded-circle bobble-image" src="'+bot.avatar+'" ' +
                 'title="'+Messenger.format().escapeHtml(bot.name)+'" />' +
-                '<div class="d-inline bobble-typing">'+templates.typing_elipsis(bot.id)+'</div></div>';
+                '<div class="d-inline bobble-typing"><div class="typing-ellipsis"><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div></div></div></div>';
         },
         typing_elipsis : function(id){
             return '<div id="typing_'+id+'" class="typing-ellipsis"><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div></div>'
