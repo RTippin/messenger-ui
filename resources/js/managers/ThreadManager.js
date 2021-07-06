@@ -46,6 +46,7 @@ window.ThreadManager = (function () {
         storage : {
             active_profiles : [],
             who_typing : [],
+            bot_typing : [],
             threads : [],
             messages : [],
             participants : [],
@@ -85,6 +86,7 @@ window.ThreadManager = (function () {
             pending_msg_stack : null,
             new_msg_alert : null,
             reply_message_alert : null,
+            seen_by_final : null
         }
     },
     mounted = {
@@ -132,6 +134,7 @@ window.ThreadManager = (function () {
                 opt.elements.group_avatar_file = $("#thread_avatar_image_file");
                 opt.elements.record_audio_message_btn = $("#record_audio_message_btn");
                 opt.elements.add_emoji_btn = $("#add_emoji_btn");
+                opt.elements.seen_by_final = $("#seen-by_final");
             }
             if([1,2,3].includes(arg.type)){
                 if(arg.type === 3) opt.storage.temp_data = arg.temp_data;
@@ -263,6 +266,7 @@ window.ThreadManager = (function () {
                 storage : {
                     active_profiles : [],
                     who_typing : [],
+                    bot_typing : [],
                     threads : opt.storage.threads,
                     messages : [],
                     participants : [],
@@ -301,6 +305,7 @@ window.ThreadManager = (function () {
                     pending_msg_stack : null,
                     new_msg_alert : null,
                     reply_message_alert : null,
+                    seen_by_final : null,
                     add_emoji_btn : null,
                 }
             })
@@ -606,27 +611,8 @@ window.ThreadManager = (function () {
             .leaving(function(user) {
                 methods.updateActiveProfile(user.provider_id, 3)
             })
-            .listenForWhisper('typing', function(user){
-                if(!opt.storage.messages.length) return;
-                if(!user.typing){
-                    methods.removeTypers(user.provider_id);
-                    return;
-                }
-                let time = new Date(),
-                find = methods.locateStorageItem({type : 'typing', id : user.provider_id});
-                if(!find.found){
-                    opt.storage.who_typing.push({
-                        id : user.provider_id,
-                        alias : user.provider_alias,
-                        avatar : user.avatar,
-                        name : user.name,
-                        time : time.getTime()
-                    });
-                    methods.addTypers();
-                    return;
-                }
-                opt.storage.who_typing[find.index].time = time.getTime();
-            })
+            .listenForWhisper('typing', methods.addTypers)
+            .listenForWhisper('stop-typing', methods.removeTypers)
             .listenForWhisper('online', function(user){
                 methods.threadOnlineStatus((user.online_status));
                 methods.updateActiveProfile(user.provider_id, user.online_status)
@@ -1034,37 +1020,83 @@ window.ThreadManager = (function () {
                 }
             });
         },
-        addTypers : function(){
-            opt.storage.who_typing.forEach((typer) => {
-                if(!$("#typing_"+typer.id).length){
-                    methods.updateBobbleHead(typer.id, null)
-                }
-            })
-            methods.drawBobbleHeads()
+        addTypers : function(user){
+            if(!opt.storage.messages.length) return;
+            if(user.provider_alias === 'bot'){
+                methods.addBotTypers(user);
+                return;
+            }
+            let time = new Date(),
+                find = methods.locateStorageItem({type : 'typing', id : user.provider_id});
+            if(!find.found){
+                opt.storage.who_typing.push({
+                    id : user.provider_id,
+                    alias : user.provider_alias,
+                    avatar : user.avatar,
+                    name : user.name,
+                    time : time.getTime()
+                });
+                opt.storage.who_typing.forEach((user) => {
+                    if(!$("#typing_"+user.id).length){
+                        methods.updateBobbleHead(user.id, null)
+                    }
+                })
+                methods.drawBobbleHeads()
+                return;
+            }
+            opt.storage.who_typing[find.index].time = time.getTime();
         },
-        removeTypers : function(x){
-            x = x || null;
+        addBotTypers : function(bot){
             let time = new Date();
-            if(x){
-                let find = methods.locateStorageItem({type : 'typing', id : x});
+            let find = methods.locateStorageItem({type : 'bot-typing', id : bot.provider_id});
+            if(!find.found){
+                opt.storage.bot_typing.push({
+                    id : bot.provider_id,
+                    alias : bot.provider_alias,
+                    avatar : bot.avatar,
+                    name : bot.name,
+                    time : time.getTime()
+                });
+                methods.drawBotTypingBobbleHeads();
+                return;
+            }
+            opt.storage.bot_typing[find.index].time = time.getTime();
+        },
+        removeTypers : function(user){
+            user = user || null;
+            let time = new Date();
+            if(user){
+                let find = methods.locateStorageItem({type : 'typing', id : user.provider_id});
                 if(find.found){
                     opt.storage.who_typing.splice(find.index, 1)
                 }
-                methods.updateBobbleHead(x, opt.storage.messages[(opt.storage.messages.length-1)].message_id);
+                methods.updateBobbleHead(user.provider_id, opt.storage.messages[(opt.storage.messages.length-1)].message_id);
                 methods.drawBobbleHeads();
                 return;
             }
             if(opt.storage.who_typing.length){
-                opt.storage.who_typing.forEach((typer, index) => {
-                    if(((time.getTime() - typer.time) / 1000) > 2){
+                opt.storage.who_typing.forEach((user, index) => {
+                    if(((time.getTime() - user.time) / 1000) > 2){
                         opt.storage.who_typing.splice(index, 1);
-                        methods.updateBobbleHead(typer.id, opt.storage.messages[(opt.storage.messages.length-1)].message_id);
+                        methods.updateBobbleHead(user.id, opt.storage.messages[(opt.storage.messages.length-1)].message_id);
                     }
                 });
                 methods.drawBobbleHeads();
                 return;
             }
+            if(opt.storage.bot_typing.length){
+                methods.removeBotTypers(time);
+                return;
+            }
             $('.typing-ellipsis').remove()
+        },
+        removeBotTypers : function(time){
+            opt.storage.bot_typing.forEach((bot, index) => {
+                if(((time.getTime() - bot.time) / 1000) > 3){
+                    opt.storage.bot_typing.splice(index, 1);
+                }
+            });
+            methods.drawBotTypingBobbleHeads();
         },
         purgeMessage : function(id){
             let message = methods.locateStorageItem({type : 'message', id : id}), i = message.index;
@@ -1086,6 +1118,12 @@ window.ThreadManager = (function () {
                 }, 20000)
             }
         },
+        drawBotTypingBobbleHeads : function(){
+            $(".bot-bobble-head").remove();
+            opt.storage.bot_typing.forEach((bot) => {
+                opt.elements.seen_by_final.prepend(ThreadTemplates.render().bot_typing_bobble_head(bot));
+            });
+        },
         drawBobbleHeads : function(){
             if(!opt.storage.participants.length || !opt.storage.messages.length) return;
             opt.storage.participants.forEach(function(value){
@@ -1093,7 +1131,7 @@ window.ThreadManager = (function () {
                 $(".bobble_head_"+value.owner_id).remove();
                 let message = $("#message_"+value.last_read.message_id);
                 if((value.caught_up && value.typing) || (opt.storage.messages[0].id === value.last_read.message_id)){
-                    $("#seen-by_final").prepend(ThreadTemplates.render().bobble_head(value, true));
+                    opt.elements.seen_by_final.prepend(ThreadTemplates.render().bobble_head(value, true));
                     value.added = true;
                     value.caught_up = true
                 }
@@ -1115,9 +1153,6 @@ window.ThreadManager = (function () {
         updateBobbleHead : function(owner, message){
             let typing = methods.locateStorageItem({type : 'typing', id : owner}),
             found = false;
-            if(typing.found && opt.storage.who_typing[typing.index].alias === 'bot'){
-                return;
-            }
             if(message === null){
                 if(typing.found && opt.storage.messages.length){
                     message = opt.storage.messages[0].id
@@ -1139,6 +1174,9 @@ window.ThreadManager = (function () {
                 opt.storage.participants[i].typing = typing.found;
                 opt.storage.participants[i].caught_up = (typing.found ? true : opt.storage.participants[i].caught_up);
                 opt.storage.participants[i].in_chat = (typing.found || found);
+                if(typing.found){
+                    opt.storage.participants[i].owner.options.online_status = 1;
+                }
                 $(".bobble_head_"+owner).remove();
                 $(".seen-by").each(function(){
                     if(!$(this).children().length) $(this).remove()
@@ -1401,19 +1439,17 @@ window.ThreadManager = (function () {
                     provider_alias : Messenger.common().provider_alias,
                     name: Messenger.common().name,
                     avatar : Messenger.common().avatar_sm,
-                    typing: true
                 });
             }
         },
         stopTyping : function(){
             if(opt.socket.online_status_setting === 1 && opt.storage.active_profiles.length && opt.socket.chat && opt.socket.send_typing > 0){
                 opt.socket.send_typing = 0;
-                opt.socket.chat.whisper('typing', {
+                opt.socket.chat.whisper('stop-typing', {
                     provider_id: Messenger.common().provider_id,
                     provider_alias : Messenger.common().provider_alias,
                     name: Messenger.common().name,
                     avatar : Messenger.common().avatar_sm,
-                    typing: false
                 });
             }
         },
@@ -1678,6 +1714,10 @@ window.ThreadManager = (function () {
                 break;
                 case 'typing':
                     collection = opt.storage.who_typing;
+                    term = 'id';
+                break;
+                case 'bot-typing':
+                    collection = opt.storage.bot_typing;
                     term = 'id';
                 break;
             }
