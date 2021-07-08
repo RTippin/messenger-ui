@@ -204,6 +204,10 @@ window.ThreadBots = (function () {
                 case 'reply':
                     extra = handlers.replies(opt.current_action.payload);
                 break;
+                case 'wiki':
+                case 'youtube':
+                    extra = handlers.result_limit(opt.current_action.payload);
+                break;
             }
             opt.current_bot_action_container.html(
                 handlers.start(opt.current_action.handler, true) +
@@ -260,6 +264,10 @@ window.ThreadBots = (function () {
                 case 'reply':
                     extra = handlers.replies();
                 break;
+                case 'wiki':
+                case 'youtube':
+                    extra = handlers.result_limit()
+                break;
             }
             opt.current_bot_action_container.html(
                 handlers.start(opt.current_handler, false) +
@@ -300,7 +308,7 @@ window.ThreadBots = (function () {
         makeHandlerFormData : function(handler){
             let form = {};
             form.handler = handler.alias;
-            form.cooldown = $("#g_s_bot_cooldown").val();
+            form.cooldown = parseInt($("#g_s_bot_cooldown").val());
             form.enabled = $("#g_s_action_enabled").is(":checked");
             form.admin_only = $("#g_s_admin_only_action").is(":checked");
             if(!handler.triggers){
@@ -325,6 +333,9 @@ window.ThreadBots = (function () {
                 replies.forEach((reply) => {
                     if(reply.trim().length) form.replies.push(reply)
                 });
+            }
+            if(['wiki', 'youtube'].includes(handler.alias)){
+                form.limit = parseInt($("#g_s_bot_result_limit").val());
             }
             return form;
         },
@@ -380,7 +391,7 @@ window.ThreadBots = (function () {
                     name : $('#g_s_bot_name').val(),
                     enabled : $("#g_s_bot_enabled").is(":checked"),
                     hide_actions : $("#g_s_hide_actions").is(":checked"),
-                    cooldown : $("#g_s_bot_cooldown").val(),
+                    cooldown : parseInt($("#g_s_bot_cooldown").val()),
                 },
                 success : function(bot){
                     methods.viewBot(bot.id)
@@ -397,7 +408,7 @@ window.ThreadBots = (function () {
                     name : $('#g_s_bot_name').val(),
                     enabled : $("#g_s_bot_enabled").is(":checked"),
                     hide_actions : $("#g_s_hide_actions").is(":checked"),
-                    cooldown : $("#g_s_bot_cooldown").val(),
+                    cooldown : parseInt($("#g_s_bot_cooldown").val()),
                 },
                 success : function(data){
                     methods.viewBot(data.id)
@@ -705,6 +716,11 @@ window.ThreadBots = (function () {
                     let replies = '<ul class="p-0 my-0 mr-0 ml-1">';
                     action.payload.replies.forEach((reply) => replies += '<li>'+Messenger.format().shortcodeToImage(reply)+'</li>');
                     return replies + '</ul>';
+                case 'youtube':
+                case 'wiki':
+                    if(action.payload){
+                        return 'Max of '+action.payload.limit+' results';
+                    }
             }
             return 'N/A';
         },
@@ -934,6 +950,21 @@ window.ThreadBots = (function () {
                 '<input autocomplete="off" class="form-control form-control-lg font-weight-bold shadow-sm mb-2" id="g_s_reply_4" placeholder="Fourth reply..." name="bot-reply-'+Date.now()+'" value="'+reply4+'">' +
                 '<input autocomplete="off" class="form-control form-control-lg font-weight-bold shadow-sm" id="g_s_reply_5" placeholder="Fifth reply..." name="bot-reply-'+Date.now()+'" value="'+reply5+'">' +
                 '</div>';
+        },
+        result_limit : function(payload){
+            let limit = 1;
+            if(payload){
+                limit = payload.limit;
+            }
+            return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
+                '    <div class="col-12"><h5 class="font-weight-bold">Max Numer of results:</h5></div>' +
+                '    <div class="input-group input-group-lg col-12 mb-0">\n' +
+                '        <div class="input-group-prepend">\n' +
+                '            <span class="input-group-text"><i class="fas fa-clock"></i></span>\n' +
+                '         </div>\n' +
+                '         <input type="number" autocomplete="off" min="1" max="10" class="form-control font-weight-bold shadow-sm" id="g_s_bot_result_limit" placeholder="Bot Cooldown" name="bot-limit-'+Date.now()+'" required value="'+limit+'">' +
+                '     </div>\n' +
+                '</div>'
         }
     };
     return {

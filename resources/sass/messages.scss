@@ -589,7 +589,7 @@
 }
 
 .message .embed-responsive{
-    max-width: 700px;
+    max-width: 425px;
     width : 35vw;
 }
 
@@ -604,19 +604,4 @@
     .form-group-xs-nm{
         margin-bottom: 0;
     }
-    .message .embed-responsive{
-        width : 55vw;
-    }
-}
-
-@media(max-width : 500px){
-    //.chat-body {
-    //    height: calc(100vh - 215px);
-    //}
-    //
-    //.chat-body.chat-special {
-    //    height: calc(100vh - 134px);
-    //    margin-bottom: 0;
-    //    padding: 0;
-    //}
 }
