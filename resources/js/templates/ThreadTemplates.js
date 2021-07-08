@@ -1,18 +1,20 @@
 window.ThreadTemplates = (function () {
     var methods = {
+        youtubeRegex : function(){
+            return /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*?[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig
+        },
         makeLinks : function(body){
             return autolinker.link(body)
         },
         makeYoutube : function(body){
-            let regExp = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*?[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig,
-                html = '<div class="embed-responsive embed-responsive-16by9 my-2"><iframe allowfullscreen class="embed-responsive-item" src="https://www.youtube.com/embed/$1"></iframe></div>';
+            let html = '<div class="embed-responsive embed-responsive-16by9 my-2"><iframe allowfullscreen class="embed-responsive-item" src="https://www.youtube.com/embed/$1"></iframe></div>';
             if(Messenger.common().mobile){
                 html = '<a class="youtube_thumb_view" target="_blank" href="https://www.youtube.com/watch?v=$1">' +
                     '<img class="msg_image NS img-fluid" src="https://img.youtube.com/vi/$1/hqdefault.jpg" />' +
                     '<div class="h3 spinner-grow text-info" style="width: 4rem; height: 4rem;" role="status"><span class="sr-only">loading...</span></div><span class="yt_logo_place"></span>'+
                     '</a>';
             }
-            return body.replace(regExp, html);
+            return body.replace(methods.youtubeRegex(), html);
         },
         format_message_body : function(body, skipExtra){
             if(skipExtra === true){
@@ -1368,6 +1370,7 @@ window.ThreadTemplates = (function () {
         render : function(){
             return templates
         },
-        mobile : methods.switch_mobile_view
+        mobile : methods.switch_mobile_view,
+        youtubeRegex : methods.youtubeRegex
     };
 }());

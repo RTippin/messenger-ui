@@ -1770,12 +1770,13 @@ window.ThreadManager = (function () {
         },
         messageStatusState : function(message, sound){
             opt.thread.click_to_read = false;
-            let didScroll = methods.threadScrollBottom(Messenger.isProvider(message.owner_id, message.owner_type), false),
-            hide = function () {
-                opt.elements.new_msg_alert.hide();
-                opt.thread.messages_unread = false;
-                opt.elements.message_container.removeClass('msg-ctnr-unread');
-            };
+            let forceScroll = (Messenger.isProvider(message.owner_id, message.owner_type) || ThreadTemplates.youtubeRegex().test(message.body)),
+                didScroll = methods.threadScrollBottom(forceScroll, false),
+                hide = function () {
+                    opt.elements.new_msg_alert.hide();
+                    opt.thread.messages_unread = false;
+                    opt.elements.message_container.removeClass('msg-ctnr-unread');
+                };
             methods.imageLoadListener(didScroll);
             if(didScroll && document.hasFocus() && (!opt.socket.is_away || (opt.socket.is_away && opt.socket.online_status_setting === 2))){
                 hide();
