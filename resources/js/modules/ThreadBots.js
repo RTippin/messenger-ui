@@ -957,7 +957,7 @@ window.ThreadBots = (function () {
                 limit = payload.limit;
             }
             return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
-                '    <div class="col-12"><h5 class="font-weight-bold">Max Numer of results:</h5></div>' +
+                '    <div class="col-12"><h5 class="font-weight-bold">Max number of results: [10 max]</h5></div>' +
                 '    <div class="input-group input-group-lg col-12 mb-0">\n' +
                 '        <div class="input-group-prepend">\n' +
                 '            <span class="input-group-text"><i class="fas fa-clock"></i></span>\n' +
