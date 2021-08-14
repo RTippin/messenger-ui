@@ -15,7 +15,7 @@
         "Messenger"
     ],
     "require": {
-        "rtippin/messenger": "~0.38"
+        "rtippin/messenger": "^1.0"
     },
     "autoload": {
         "psr-4": {
