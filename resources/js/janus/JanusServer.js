@@ -1056,7 +1056,7 @@ window.JanusServer = (function () {
         loading_media : function () {
             return '<div class="col-12 text-center mt-2">\n' +
                 '   <span class="h4">\n' +
-                '     <span class="badge badge-pill badge-light">Loading media <span class="spinner-border spinner-border-sm text-primary" role="status"></span></span>\n' +
+                '     <span class="badge badge-pill badge-light">Loading media <span class="spinner-grow spinner-grow-sm text-primary" role="status"></span></span>\n' +
                 '     </span>\n' +
                 ' </div>'
         }

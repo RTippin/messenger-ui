@@ -75,7 +75,7 @@ window.ThreadTemplates = (function () {
                 'onclick="'+(ThreadManager.state().type === 3 ? 'ThreadManager.newForms().newPrivate(0);' : 'ThreadManager.send();')+' return false;" class="text-success h3"><i class="fas fa-paper-plane"></i></a></div>'
         },
         socket_error : function(){
-            return '<div class="my-2 alert alert-danger text-danger socket-error-main text-center"><span class="spinner-border spinner-border-sm"></span> Connection error, messages may be delayed</div>';
+            return '<div class="my-2 alert alert-danger text-danger socket-error-main text-center"><span class="spinner-grow spinner-grow-sm"></span> Connection error, messages may be delayed</div>';
         },
         thread_socket_error : function(group){
             return '<span class="thread_error_area NS">' +
@@ -100,7 +100,7 @@ window.ThreadTemplates = (function () {
             return '<div id="typing_'+id+'" class="typing-ellipsis"><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div><div><i class="fas fa-circle"></i></div></div>'
         },
         loader : function(){
-            return '<div class="col-12 mt-5 text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"></div></div>'
+            return '<div class="col-12 mt-5 text-center"><div class="spinner-grow spinner-grow-sm text-primary" role="status"></div></div>'
         },
         demoChatMsg : function(){
             return '<div class="col-12 mt-5 text-center h4"><span class="badge badge-pill badge-secondary"><i class="fas fa-comment-slash"></i> Demo Chat Placeholder</span></div>'
@@ -383,7 +383,7 @@ window.ThreadTemplates = (function () {
                 '<h5> <i class="far fa-clock"></i>a few seconds ago</h5></div><hr><div class="message-text">' +
                 templates.message_body(data, true) +
                 '</div></div></div>' +
-                '<div id="pending_message_loading_'+data.id+'" class="float-right pt-2 h6 text-primary NS"><span title="Sending..." class="spinner-border spinner-border-sm"></span></div>' +
+                '<div id="pending_message_loading_'+data.id+'" class="float-right pt-2 h6 text-primary NS"><span title="Sending..." class="spinner-grow spinner-grow-sm"></span></div>' +
                 '<div class="clearfix"></div></div>'
         },
         pending_message_grouped : function(data){
@@ -391,7 +391,7 @@ window.ThreadTemplates = (function () {
                 '<div class="message-text pt-2">' +
                 templates.message_body(data, true) +
                 '</div></div></div>' +
-                '<div id="pending_message_loading_'+data.id+'" class="float-right pt-1 h6 text-primary NS"><span title="Sending..." class="spinner-border spinner-border-sm"></span></div>' +
+                '<div id="pending_message_loading_'+data.id+'" class="float-right pt-1 h6 text-primary NS"><span title="Sending..." class="spinner-grow spinner-grow-sm"></span></div>' +
                 '<div class="clearfix"></div></div>'
         },
         images_message : function(data){
@@ -538,7 +538,7 @@ window.ThreadTemplates = (function () {
         },
         loading_history : function(){
             return '<div id="loading_history_marker" class="system-message pt-0 mt-n4 w-100 text-center"> ' +
-                '<span class="text-primary spinner-border spinner-border-sm"></span></div>';
+                '<span class="text-primary spinner-grow spinner-grow-sm"></span></div>';
         },
         end_of_history : function(created_at){
             return '<div title="Conversation started on '+moment(Messenger.format().makeUtcLocal(created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'"' +
@@ -1212,7 +1212,7 @@ window.ThreadTemplates = (function () {
             return '<div id="thread_header_area"><div class="dropdown float-right">\n' +
                 '</div>' +
                 (demo ? templates.thread_private_header_bobble(null, true)
-                    : '<div class="h3 font-weight-bold"><div class="d-inline-block mt-2 ml-2"><div class="spinner-border text-primary" role="status"></div></div></div>')+
+                    : '<div class="h3 font-weight-bold"><div class="d-inline-block mt-2 ml-2"><div class="spinner-grow text-primary" role="status"></div></div></div>')+
                 '</div>'+
                 '<div class="card messages-panel mt-1">\n' +
                 '    <div class="message-body" id="thread_new_group">\n' +
