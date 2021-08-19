@@ -288,7 +288,7 @@ window.Messenger = (function () {
                 return "<div class='modal-footer'><div class='mx-auto'><button type='button' class='btn btn-sm btn-light modal_close' data-dismiss='modal'>"+options.close_btn_txt+"</button></div></div>";
             },
             body = function(options){
-                return (options.body || options.pre_loader ? "<div id='body_modal' class='modal-body text-dark "+(options.h4 ? ' h4' : '')+"'>"+(options.pre_loader ? alerts.loader() : options.body)+"</div>" : "");
+                return (options.body || options.pre_loader ? "<div id='body_modal' class='modal-body text-dark "+(options.h4 ? ' h4' : '')+"'>"+(options.pre_loader ? alerts.loader(true) : options.body)+"</div>" : "");
             },
             template = function(options){
                 return "<div id='main_modal' class='modal fade' role='dialog'>" +
@@ -330,7 +330,7 @@ window.Messenger = (function () {
         },
         fillModal : function(arg){
             $("#modal_cb_btn").show();
-            $("#body_modal").html(("loader" in arg ? alerts.loader() : arg.body));
+            $("#body_modal").html(("loader" in arg ? alerts.loader(true) : arg.body));
             if("title" in arg) $("#title_modal").html(arg.title);
             if("no_close" in arg) $(".modClose, .modal-footer").remove();
         },
