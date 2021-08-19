@@ -1,5 +1,12 @@
 # Messenger UI
 
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Total Downloads][ico-downloads]][link-downloads]
+[![StyleCI][ico-styleci]][link-styleci]
+[![License][ico-license]][link-license]
+
+---
+
 ## For use with [rtippin/messenger][link-messenger]
 
 ### Features
@@ -48,3 +55,12 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
 
 
 [link-messenger]: https://github.com/RTippin/messenger
+[link-author]: https://github.com/rtippin
+[ico-version]: https://img.shields.io/packagist/v/rtippin/messenger-ui.svg?style=plastic&cacheSeconds=3600
+[ico-downloads]: https://img.shields.io/packagist/dt/rtippin/messenger-ui.svg?style=plastic&cacheSeconds=3600
+[ico-styleci]: https://styleci.io/repos/379743201/shield?style=plastic&cacheSeconds=3600
+[ico-license]: https://img.shields.io/github/license/RTippin/messenger-ui?style=plastic
+[link-packagist]: https://packagist.org/packages/rtippin/messenger-ui
+[link-downloads]: https://packagist.org/packages/rtippin/messenger-ui
+[link-license]: https://packagist.org/packages/rtippin/messenger-ui
+[link-styleci]: https://styleci.io/repos/379743201
