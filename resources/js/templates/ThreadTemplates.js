@@ -249,7 +249,7 @@ window.ThreadTemplates = (function () {
                 '<div class="media"><div class="media-left media-middle"><img src="'+data.owner.avatar.sm+'" class="media-object rounded-circle thread-list-avatar avatar-is-offline" /></div>' +
                 '<div class="media-body thread_body_li"><div class="header d-inline"><small><div class="float-right date"><time class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></div></small>' +
                 '<div class="from font-weight-bold">'+data.owner.name+'</div></div><div class="description"><em><i class="fas fa-music"></i> '+data.body+'</em></div></div></div></a>' +
-                '<div class="col-12 text-center"><audio controls preload="none"><source src="'+data.audio+'?stream=true"></audio></div>' +
+                '<div class="col-12 text-center"><audio controls preload="none" class="message-audio-player"><source src="'+data.audio+'?stream=true"></audio></div>' +
                 '</li>'
         },
         messenger_search_friend : function(profile){
@@ -328,7 +328,7 @@ window.ThreadTemplates = (function () {
                 case 2:
                     return '<a href="'+data.document+'" target="_blank"><i class="fas fa-file-download"></i> '+data.body+'</a>';
                 case 3:
-                    let audio = '<audio controls preload="none"><source src="'+data.audio+'?stream=true"></audio>';
+                    let audio = '<audio controls preload="none" class="message-audio-player"><source src="'+data.audio+'?stream=true"></audio>';
                     if(data.extra !== null && data.extra.audio_message){
                         return '<a href="'+data.audio+'" target="_blank"><i class="fas fa-volume-up"></i> Audio Message</a><hr>' +audio;
                     }
@@ -495,7 +495,7 @@ window.ThreadTemplates = (function () {
             return '<div id="message_'+data.id+'" class="message info"><a '+(data.owner.route ? '' : 'onclick="return false;"')+' ' +
                 'href="'+(data.owner.route ? data.owner.route : '#')+'" target="_blank"><img title="'+Messenger.format().escapeHtml(data.owner.name)+'" class="rounded-circle message-avatar" src="'+data.owner.avatar.sm+'"></a>' +
                 '<div class="message-body"><div class="message-body-inner"><div class="message-info">' +
-                '<h4>'+data.owner.name+(data.from_bot ? '<span class="badge badge-warning">BOT</span>' : '')+'</h4>' +
+                '<h4>'+data.owner.name+(data.from_bot ? '<span class="ml-1 badge badge-warning">BOT</span>' : '')+'</h4>' +
                 '<h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
                 templates.message_body(data, false) +
                 '</div></div></div>' +templates.message_options(data, false)+
@@ -514,7 +514,7 @@ window.ThreadTemplates = (function () {
             return '<div id="message_'+data.id+'" class="message info"><a '+(data.owner.route ? '' : 'onclick="return false;"')+' ' +
                 'href="'+(data.owner.route ? data.owner.route : '#')+'" target="_blank"><img title="'+Messenger.format().escapeHtml(data.owner.name)+'" class="rounded-circle message-avatar" src="'+data.owner.avatar.sm+'"></a>' +
                 '<div class="message-body '+templates.message_reply_highlight(data)+'"><div class="message-body-inner"><div class="message-info">' +
-                '<h4>'+data.owner.name+(data.from_bot ? '<span class="badge badge-warning">BOT</span>' : '')+'</h4>' +
+                '<h4>'+data.owner.name+(data.from_bot ? '<span class="ml-1 badge badge-warning">BOT</span>' : '')+'</h4>' +
                 '<h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
                 templates.message_reply_item(data) +
                 templates.message_body(data, false) +
@@ -523,11 +523,11 @@ window.ThreadTemplates = (function () {
                 '</div><div class="clearfix"></div></div>'
         },
         message_reply_item : function(data){
-            let msg = '<footer class="blockquote-footer text-light">Replying to unknown</footer>';
+            let msg = '<footer class="blockquote-footer reply-text">Replying to unknown</footer>';
             if(data.hasOwnProperty('reply_to') && data.reply_to !== null){
-                msg = '<p class="mb-0">'+templates.message_body(data.reply_to, false, true)+'</p><footer class="blockquote-footer text-light">Replying to '+data.reply_to.owner.name+'</footer>';
+                msg = '<p class="mb-0">'+templates.message_body(data.reply_to, false, true)+'</p><footer class="blockquote-footer reply-text">Replying to '+data.reply_to.owner.name+'</footer>';
             }
-            return '<blockquote class="pl-2 mb-1 border-left border-info">'+msg+'</blockquote><hr>';
+            return '<blockquote class="pl-2 mb-1 border-left reply-border">'+msg+'</blockquote><hr>';
         },
         message_reply_highlight : function(data){
             return data.hasOwnProperty('reply_to')
