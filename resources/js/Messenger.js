@@ -124,7 +124,7 @@ window.Messenger = (function () {
                     && opt.provider_alias === alias;
             }
             return opt.provider_id === id
-                && opt.provider_model === model;
+                && opt.provider_model === model.replace(/\\/g, '');
         }
     },
     format = {
