@@ -9,9 +9,15 @@
 
 ## For use with [rtippin/messenger][link-messenger]
 
-### Features
-- Ready-made UI and web routes for use with the core messenger package.
-- Laravel echo setup and ready to connect to your laravel-echo-server!
+### Ready-made UI and web routes for use with [rtippin/messenger][link-messenger].
+
+### Notes
+- This package provides web routes that pertain to the `messenger` core. No authentication routes/system will be setup for you.
+- Our compiled `NotifyManager.js` uses laravel echo, with the `socket.io` library (no option for pusher at this time). 
+- You will need to setup your own websocket implementation for `socket.io`, as well as configure your laravel app's broadcast driver to use your websocket credentials.
+  - For a quick setup using [tlaverdure/laravel-echo-server][link-echo-server] websockets, follow the instructions at the bottom.
+
+---
 
 # Installation
 
@@ -26,10 +32,12 @@ $ composer require rtippin/messenger-ui
 ```bash
 $ php artisan messenger:ui:publish
 ```
-- To update only our compiled assets, run:
+- To update only our compiled assets (when using composer to update our package), run:
 ```bash
 $ php artisan vendor:publish --tag=messenger-ui.assets --force
 ```
+
+---
 
 # Config
 
@@ -48,11 +56,15 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
 ],
 ```
 - Site name is used in our views to inject the name in the navbar.
-- Socket endpoint is used for the socket.io endpoint.
+- Socket endpoint is used for your socket.io endpoint.
 - For the web routes, you may choose your desired endpoint domain, prefix and middleware.
   - Invite join web route you can define separate middleware from the rest of the web routes, as you may want a guest allowed to view that page.
 - The default `messenger.provider` middleware is included with `Messenger Core` and simply sets the active messenger provider by grabbing the authed user from `$request->user()`.
 
+---
+
+# Using Laravel Echo Server
+- TODO
 
 [link-messenger]: https://github.com/RTippin/messenger
 [link-author]: https://github.com/rtippin
@@ -64,3 +76,4 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
 [link-downloads]: https://packagist.org/packages/rtippin/messenger-ui
 [link-license]: https://packagist.org/packages/rtippin/messenger-ui
 [link-styleci]: https://styleci.io/repos/379743201
+[link-echo-server]: https://github.com/tlaverdure/laravel-echo-server
