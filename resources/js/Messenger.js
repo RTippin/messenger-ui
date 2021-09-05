@@ -5,6 +5,12 @@ window.Messenger = (function () {
         API : null,
         WEB : null,
         SOCKET : null,
+        SOCKET_PUSHER : false,
+        SOCKET_KEY : null,
+        SOCKET_AUTH_ENDPOINT : null,
+        SOCKET_PORT : 6001,
+        SOCKET_CLUSTER : null,
+        SOCKET_TLS : false,
         env : 'production',
         websockets : true,
         lockout : false,
@@ -47,6 +53,14 @@ window.Messenger = (function () {
                 opt.API = arg.common.api_endpoint + '/';
                 opt.WEB = arg.common.web_endpoint;
                 opt.SOCKET = arg.common.socket_endpoint;
+                opt.SOCKET_PUSHER = arg.common.socket_pusher;
+                opt.SOCKET_KEY = arg.common.socket_key;
+                opt.SOCKET_AUTH_ENDPOINT = arg.common.socket_auth_endpoint;
+                opt.SOCKET_PORT = arg.common.socket_port;
+                opt.SOCKET_TLS = arg.common.socket_tls;
+                if(opt.SOCKET_PUSHER){
+                    opt.SOCKET_CLUSTER = arg.common.socket_cluster;
+                }
                 opt.APP_NAME = arg.common.app_name;
                 opt.mobile = arg.common.mobile;
                 opt.dark_mode = arg.common.dark_mode;
@@ -128,11 +142,11 @@ window.Messenger = (function () {
         }
     },
     format = {
-        makeUtcLocal : function(date){
-            return moment.utc(date).local().format('YYYY-MM-DD HH:mm:ss')
+        makeHumanTime : function(date){
+            return dayjs(date).format('ddd, MMM Do YYYY, h:mm:ssa')
         },
         makeTimeAgo : function(date){
-            return moment(format.makeUtcLocal(date)).fromNow()
+            return dayjs(date).fromNow()
         },
         escapeHtml : function(text) {
             let map = {
@@ -153,8 +167,8 @@ window.Messenger = (function () {
         },
         timeDiffInUnit : function (date1, date2, unit) {
             if(!date1 || !date2 || !unit) return 0;
-            let d1 = moment(format.makeUtcLocal(date1)),
-                d2 = moment(format.makeUtcLocal(date2));
+            let d1 = dayjs(date1),
+                d2 = dayjs(date2);
             return d1.diff(d2, unit)
         },
         copyText : function(btnID, inputID){
@@ -712,6 +726,12 @@ window.Messenger = (function () {
                 API : opt.API,
                 WEB : opt.WEB,
                 SOCKET : opt.SOCKET,
+                SOCKET_PUSHER : opt.SOCKET_PUSHER,
+                SOCKET_KEY : opt.SOCKET_KEY,
+                SOCKET_AUTH_ENDPOINT : opt.SOCKET_AUTH_ENDPOINT,
+                SOCKET_PORT : opt.SOCKET_PORT,
+                SOCKET_TLS : opt.SOCKET_TLS,
+                SOCKET_CLUSTER : opt.SOCKET_CLUSTER,
                 provider_alias : opt.provider_alias,
                 provider_id : opt.provider_id,
                 provider_model : opt.provider_model,

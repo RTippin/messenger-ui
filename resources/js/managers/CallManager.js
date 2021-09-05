@@ -71,7 +71,7 @@ window.CallManager = (function () {
             opt.thread_name = call.meta.thread_name;
             opt.call_admin = call.options.admin;
             opt.created_at = call.created_at;
-            opt.INIT_time = moment.now();
+            opt.INIT_time = dayjs();
             mounted.setJanusInfo(call, false);
             NotifyManager.setTitle(call.meta.thread_name + ' | ' + 'Video Call');
         },
@@ -142,7 +142,7 @@ window.CallManager = (function () {
         },
         setConnections : function (delayed) {
             if(!Messenger.common().modules.includes('NotifyManager') || !NotifyManager.sockets().status){
-                if(Messenger.format().timeDiffInUnit(moment.now(), opt.INIT_time, 'seconds') >= 8){
+                if(Messenger.format().timeDiffInUnit(dayjs(), opt.INIT_time, 's') >= 8){
                     delayed = true;
                 }
                 setTimeout(function () {

@@ -163,7 +163,7 @@ window.ThreadTemplates = (function () {
         thread_logs : function(data){
             let html = '';
             data.data.forEach(function (message) {
-                html += '<span class="badge badge-pill badge-light">'+moment(Messenger.format().makeUtcLocal(message.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'</span>';
+                html += '<span class="badge badge-pill badge-light">'+Messenger.format().makeHumanTime(message.created_at)+'</span>';
                 html += templates.system_message(message, true)
             });
             if(!data.meta.final_page){
@@ -230,12 +230,12 @@ window.ThreadTemplates = (function () {
             return html
         },
         message_edit_item : function(data){
-            return '<li title="Edited on '+moment(Messenger.format().makeUtcLocal(data.edited_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="thread_list_item mb-2">' +
+            return '<li title="Edited on '+Messenger.format().makeHumanTime(data.edited_at)+'" class="thread_list_item mb-2">' +
                 methods.format_message_body(data.body, true) +
                 '</li>'
         },
         document_item : function(data){
-            return '<li title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="thread_list_item mb-2">' +
+            return '<li title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+Messenger.format().makeHumanTime(data.created_at)+'" class="thread_list_item mb-2">' +
                 '<div class="thread-list-status"><span class="shadow-sm badge badge-pill badge-success">Document <i class="fas fa-file-alt"></i></span></div> '+
                 '<a target="_blank" href="'+data.document+'">' +
                 '<div class="media"><div class="media-left media-middle"><img src="'+data.owner.avatar.sm+'" class="media-object rounded-circle thread-list-avatar avatar-is-offline" /></div>' +
@@ -243,7 +243,7 @@ window.ThreadTemplates = (function () {
                 '<div class="from font-weight-bold">'+data.owner.name+'</div></div><div class="description"><em><i class="fas fa-file-download"></i> '+data.body+'</em></div></div></div></a></li>'
         },
         audio_item : function(data){
-            return '<li title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="thread_list_item mb-2">' +
+            return '<li title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+Messenger.format().makeHumanTime(data.created_at)+'" class="thread_list_item mb-2">' +
                 '<div class="thread-list-status"><span class="shadow-sm badge badge-pill badge-success">Audio <i class="fas fa-music"></i></span></div> '+
                 '<a target="_blank" href="'+data.audio+'">' +
                 '<div class="media"><div class="media-left media-middle"><img src="'+data.owner.avatar.sm+'" class="media-object rounded-circle thread-list-avatar avatar-is-offline" /></div>' +
@@ -336,7 +336,7 @@ window.ThreadTemplates = (function () {
                 default:
                     let body = methods.format_message_body(data.body);
 
-                    return data.edited ? body + ' <span onclick="ThreadManager.load().messageEdits(\''+data.edited_history_route+'\')" class="pointer_area"><small class="font-weight-bold text-muted" title="Edited on '+moment(Messenger.format().makeUtcLocal(data.updated_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'">(edited)</small></span>' : body;
+                    return data.edited ? body + ' <span onclick="ThreadManager.load().messageEdits(\''+data.edited_history_route+'\')" class="pointer_area"><small class="font-weight-bold text-muted" title="Edited on '+Messenger.format().makeHumanTime(data.updated_at)+'">(edited)</small></span>' : body;
             }
         },
         message_options : function(data, grouped){
@@ -398,7 +398,7 @@ window.ThreadTemplates = (function () {
             return '<div class="messages-image-view col text-center">' +
                 '<a target="_blank" href="'+data.image.lg+'">' +
                 '<img class="lazy img-fluid shadow rounded" data-src="'+data.image.md+'" /><br><br>' +
-                Messenger.format().escapeHtml(data.owner.name)+' on '+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+
+                Messenger.format().escapeHtml(data.owner.name)+' on '+Messenger.format().makeHumanTime(data.created_at)+
                 '</a></div><hr>'
         },
         message_reactions : function(message, mine, grouped){
@@ -468,7 +468,7 @@ window.ThreadTemplates = (function () {
         },
         my_message : function(data){
             return '<div id="message_'+data.id+'" class="message my-message"><div class="message-body"><div class="message-body-inner"><div class="message-info">' +
-                '<h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
+                '<h5> <i class="far fa-clock"></i><time title="'+Messenger.format().makeHumanTime(data.created_at)+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
                 templates.message_body(data, false) +
                 '</div></div></div>'+templates.my_message_options(data, false)+
                 '<div class="reactions">'+templates.message_reactions(data, true, false)+
@@ -476,7 +476,7 @@ window.ThreadTemplates = (function () {
         },
         my_message_grouped : function(data){
             return '<div id="message_'+data.id+'" class="message grouped-message my-message"><div class="message-body"><div class="message-body-inner">' +
-                '<div title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="message-text pt-2">' +
+                '<div title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+Messenger.format().makeHumanTime(data.created_at)+'" class="message-text pt-2">' +
                 templates.message_body(data, false) +
                 '</div></div></div>'+templates.my_message_options(data, true)+
                 '<div class="reactions">'+templates.message_reactions(data, true, true)+
@@ -484,7 +484,7 @@ window.ThreadTemplates = (function () {
         },
         my_message_reply : function(data){
             return '<div id="message_'+data.id+'" class="message my-message"><div class="message-body"><div class="message-body-inner"><div class="message-info">' +
-                '<h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
+                '<h5> <i class="far fa-clock"></i><time title="'+Messenger.format().makeHumanTime(data.created_at)+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
                 templates.message_reply_item(data) +
                 templates.message_body(data, false) +
                 '</div></div></div>'+templates.my_message_options(data, false)+
@@ -496,7 +496,7 @@ window.ThreadTemplates = (function () {
                 'href="'+(data.owner.route ? data.owner.route : '#')+'" target="_blank"><img title="'+Messenger.format().escapeHtml(data.owner.name)+'" class="rounded-circle message-avatar" src="'+data.owner.avatar.sm+'"></a>' +
                 '<div class="message-body"><div class="message-body-inner"><div class="message-info">' +
                 '<h4>'+data.owner.name+(data.from_bot ? '<span class="ml-1 badge badge-warning">BOT</span>' : '')+'</h4>' +
-                '<h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
+                '<h5> <i class="far fa-clock"></i><time title="'+Messenger.format().makeHumanTime(data.created_at)+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
                 templates.message_body(data, false) +
                 '</div></div></div>' +templates.message_options(data, false)+
                 '<div class="reactions">'+templates.message_reactions(data, false, false)+
@@ -504,7 +504,7 @@ window.ThreadTemplates = (function () {
         },
         message_grouped : function(data){
             return '<div id="message_'+data.id+'" class="message grouped-message info"><div class="message-body"><div class="message-body-inner">' +
-                '<div title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="message-text pt-2">' +
+                '<div title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+Messenger.format().makeHumanTime(data.created_at)+'" class="message-text pt-2">' +
                 templates.message_body(data, false) +
                 '</div></div></div> '+templates.message_options(data, true)+
                 '<div class="reactions">'+templates.message_reactions(data, false, true)+
@@ -515,7 +515,7 @@ window.ThreadTemplates = (function () {
                 'href="'+(data.owner.route ? data.owner.route : '#')+'" target="_blank"><img title="'+Messenger.format().escapeHtml(data.owner.name)+'" class="rounded-circle message-avatar" src="'+data.owner.avatar.sm+'"></a>' +
                 '<div class="message-body '+templates.message_reply_highlight(data)+'"><div class="message-body-inner"><div class="message-info">' +
                 '<h4>'+data.owner.name+(data.from_bot ? '<span class="ml-1 badge badge-warning">BOT</span>' : '')+'</h4>' +
-                '<h5> <i class="far fa-clock"></i><time title="'+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
+                '<h5> <i class="far fa-clock"></i><time title="'+Messenger.format().makeHumanTime(data.created_at)+'" class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></h5></div><hr><div class="message-text">' +
                 templates.message_reply_item(data) +
                 templates.message_body(data, false) +
                 '</div></div></div>' +templates.message_options(data, false)+
@@ -541,7 +541,7 @@ window.ThreadTemplates = (function () {
                 '<span class="text-primary spinner-grow spinner-grow-sm"></span></div>';
         },
         end_of_history : function(created_at){
-            return '<div title="Conversation started on '+moment(Messenger.format().makeUtcLocal(created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'"' +
+            return '<div title="Conversation started on '+Messenger.format().makeHumanTime(created_at)+'"' +
                 ' id="end_history_marker" class="alert-dark shadow-sm rounded mb-4 mt-n3 w-100 text-center text-dark"> ' +
                 '<strong><i class="fas fa-comments"></i> Start of conversation</div>';
         },
@@ -589,7 +589,7 @@ window.ThreadTemplates = (function () {
                 break;
             }
             return '<div id="'+(modal === true ? 'modal_' : '')+'message_'+data.id+'" class="system-message alert-warning rounded py-1 w-100 text-center" ' +
-                    'title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+moment(Messenger.format().makeUtcLocal(data.created_at)).format('ddd, MMM Do YYYY, h:mm:ssa')+'"><i class="'+icon+'"></i> ' +
+                    'title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+Messenger.format().makeHumanTime(data.created_at)+'"><i class="'+icon+'"></i> ' +
                     '<strong>'+data.owner.name+'</strong> '+data.body+extra+'</div>';
         },
         thread_call_state : function(data){
@@ -1269,7 +1269,7 @@ window.ThreadTemplates = (function () {
                     '</td>\n' +
                     '<td>\n' +
                     '    <div class="float-right nowrap">\n' +
-                    '        <span class="mt-2 shadow-sm badge badge-pill badge-secondary"><i class="far fa-calendar-alt"></i> '+(moment(Messenger.format().makeUtcLocal(friend.created_at)).format('ddd, MMM Do YYYY'))+'</span>\n' +
+                    '        <span class="mt-2 shadow-sm badge badge-pill badge-secondary"><i class="far fa-calendar-alt"></i> '+(Messenger.format().makeHumanTime(friend.created_at))+'</span>\n' +
                     '    </div>\n' +
                     '</td>\n' +
                     '</tr>'

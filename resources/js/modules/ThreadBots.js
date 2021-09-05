@@ -834,7 +834,7 @@ window.ThreadBots = (function () {
                 '                </td>\n' +
                 '                <td>\n' +
                 '                    <div class="mt-1 float-right"><span class="switch switch-sm mt-1">\n' +
-                '                        <input class="switch switch_input m_setting_toggle" id="g_s_admin_only_action" name="g_s_admin_only_action" type="checkbox" '+(admin_only ? 'alert-success' : '')+'>\n' +
+                '                        <input class="switch switch_input m_setting_toggle" id="g_s_admin_only_action" name="g_s_admin_only_action" type="checkbox" '+(admin_only ? 'checked' : '')+'>\n' +
                 '                        <label for="g_s_admin_only_action"></label>\n' +
                 '                    </span></div>\n' +
                 '                </td>\n' +
