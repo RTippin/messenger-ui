@@ -148,32 +148,44 @@ window.NotifyManager = (function () {
         Echo : function(reconnected){
             if(!Messenger.common().websockets) return;
             opt.socket.forced_disconnect = false;
-            opt.socket.Echo = new Echo({
+            opt.socket.Echo = new Echo(broadcaster.makeEcho());
+            opt.socket.Echo.connector.pusher.connection.bind('connected', () => {
+                broadcaster.clearPusherLocalStorage();
+                    opt.socket.socket_status = true;
+                    broadcaster.PrivateChannel();
+                    if(reconnected) broadcaster.reconnected(true)
+            });
+            opt.socket.Echo.connector.pusher.connection.bind('disconnected', () => {
+                broadcaster.clearPusherLocalStorage();
+                opt.socket.socket_status = false;
+                if(Messenger.common().modules.includes('ThreadManager')) ThreadManager.state().socketStatusCheck();
+                if(CallManager.state().initialized) CallManager.channel().disconnected();
+                if(!opt.socket.forced_disconnect && !Messenger.common().SOCKET_PUSHER){
+                    setTimeout(function(){
+                        broadcaster.Echo(true)
+                    }, 2000)
+                }
+            });
+        },
+        makeEcho : function(){
+            if(Messenger.common().SOCKET_PUSHER){
+                return {
+                    broadcaster : 'pusher',
+                    key: Messenger.common().SOCKET_KEY,
+                    cluster: Messenger.common().SOCKET_CLUSTER,
+                    forceTLS: Messenger.common().SOCKET_TLS,
+                    authEndpoint: Messenger.common().SOCKET_AUTH_ENDPOINT,
+                };
+            }
+            return {
                 broadcaster : 'pusher',
-                host : Messenger.common().SOCKET,
                 key: Messenger.common().SOCKET_KEY,
                 wsHost: Messenger.common().SOCKET,
                 wsPort: Messenger.common().SOCKET_PORT,
                 forceTLS: Messenger.common().SOCKET_TLS,
                 disableStats: true,
                 authEndpoint: Messenger.common().SOCKET_AUTH_ENDPOINT,
-            });
-            opt.socket.Echo.connector.pusher.connection.bind('connected', () => {
-                    opt.socket.socket_status = true;
-                    broadcaster.PrivateChannel();
-                    if(reconnected) broadcaster.reconnected(true)
-            });
-            opt.socket.Echo.connector.pusher.connection.bind('disconnected', () => {
-                localStorage.removeItem('pusherTransportNonTLS');
-                opt.socket.socket_status = false;
-                if(Messenger.common().modules.includes('ThreadManager')) ThreadManager.state().socketStatusCheck();
-                if(CallManager.state().initialized) CallManager.channel().disconnected();
-                if(!opt.socket.forced_disconnect){
-                    setTimeout(function(){
-                        broadcaster.Echo(true)
-                    }, 2000)
-                }
-            });
+            };
         },
         reconnected : function(full){
             if(typeof full === "boolean" && !full) broadcaster.heartBeat(false, true, true);
@@ -228,6 +240,11 @@ window.NotifyManager = (function () {
                 return;
             }
             opt.storage.heartbeat_interval = setInterval(payload, 120000)
+        },
+        clearPusherLocalStorage : function(){
+            if(!Messenger.common().SOCKET_PUSHER){
+                localStorage.removeItem('pusherTransportNonTLS');
+            }
         }
     },
     Heartbeat = {
