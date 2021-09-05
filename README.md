@@ -13,9 +13,10 @@
 
 ### Notes
 - This package provides web routes that pertain to the `messenger` core. No authentication routes/system will be setup for you.
-- Our compiled `NotifyManager.js` uses laravel echo, with the `socket.io` library (no option for pusher at this time). 
+- Our compiled `NotifyManager.js` uses laravel echo, with the `socket.io` library. 
 - You will need to setup your own websocket implementation for `socket.io`, as well as configure your laravel app's broadcast driver to use your websocket credentials.
   - For a quick setup using [tlaverdure/laravel-echo-server][link-echo-server] websockets, follow the instructions at the bottom.
+- Future support for `pusher.js` library, along with the [Laravel Websockets][link-laravel-websockets] package will be added.
 
 ---
 
@@ -32,7 +33,7 @@ $ composer require rtippin/messenger-ui
 ```bash
 $ php artisan messenger:ui:publish
 ```
-- To update only our compiled assets (when using composer to update our package), run:
+- When using composer to update this package, we recommend republishing our JS/CSS assets:
 ```bash
 $ php artisan vendor:publish --tag=messenger-ui.assets --force
 ```
@@ -77,3 +78,4 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
 [link-license]: https://packagist.org/packages/rtippin/messenger-ui
 [link-styleci]: https://styleci.io/repos/379743201
 [link-echo-server]: https://github.com/tlaverdure/laravel-echo-server
+[link-laravel-websockets]: https://beyondco.de/docs/laravel-websockets/getting-started/introduction
