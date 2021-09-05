@@ -31,9 +31,8 @@ return [
     | Messenger-UI web routes config
     |--------------------------------------------------------------------------
     |
-    | Invite view / redemption routes for both web and api have individual
-    | middleware control so you may allow both guest or authed users to
-    | access.
+    | Invite view / redemption routes have individual middleware control so
+    | that you may allow both guest or authed users to access.
     |
     | *For the broadcasting channels to register, you must have already
     | setup/defined your laravel apps broadcast driver.
@@ -43,6 +42,6 @@ return [
         'domain' => null,
         'prefix' => 'messenger',
         'middleware' => ['web', 'auth', 'messenger.provider'],
-        'invite_middleware' => ['web', 'auth.optional', 'messenger.provider'],
+        'invite_middleware' => ['web', 'messenger.provider'],
     ],
 ];
