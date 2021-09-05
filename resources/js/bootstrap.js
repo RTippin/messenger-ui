@@ -52,7 +52,13 @@ window.Autolinker = require('autolinker');
 import dt from 'datatables.net-bs4';
 window.dt = require( 'datatables.net');
 window.toastr = require('toastr');
-window.moment = require('moment');
+window.dayjs = require('dayjs');
+let relativeTime = require('dayjs/plugin/relativeTime');
+let advancedFormat = require('dayjs/plugin/advancedFormat');
+let utc = require('dayjs/plugin/utc');
+dayjs.extend(relativeTime);
+dayjs.extend(advancedFormat);
+dayjs.extend(utc);
 import 'simplebar';
 
 /**

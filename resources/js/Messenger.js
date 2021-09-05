@@ -142,11 +142,11 @@ window.Messenger = (function () {
         }
     },
     format = {
-        makeUtcLocal : function(date){
-            return moment.utc(date).local().format('YYYY-MM-DD HH:mm:ss')
+        makeHumanTime : function(date){
+            return dayjs(date).format('ddd, MMM Do YYYY, h:mm:ssa')
         },
         makeTimeAgo : function(date){
-            return moment(format.makeUtcLocal(date)).fromNow()
+            return dayjs(date).fromNow()
         },
         escapeHtml : function(text) {
             let map = {
@@ -167,8 +167,8 @@ window.Messenger = (function () {
         },
         timeDiffInUnit : function (date1, date2, unit) {
             if(!date1 || !date2 || !unit) return 0;
-            let d1 = moment(format.makeUtcLocal(date1)),
-                d2 = moment(format.makeUtcLocal(date2));
+            let d1 = dayjs(date1),
+                d2 = dayjs(date2);
             return d1.diff(d2, unit)
         },
         copyText : function(btnID, inputID){
