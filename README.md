@@ -7,16 +7,13 @@
 
 ---
 
-## For use with [rtippin/messenger][link-messenger]
-
-### Ready-made UI and web routes for use with [rtippin/messenger][link-messenger].
+## Ready-made UI and web routes for use with [rtippin/messenger][link-messenger]
 
 ### Notes
 - This package provides web routes that pertain to the `messenger` core. No authentication routes/system will be setup for you.
-- Our compiled `NotifyManager.js` uses laravel echo, with the `socket.io` library. 
-- You will need to setup your own websocket implementation for `socket.io`, as well as configure your laravel app's broadcast driver to use your websocket credentials.
-  - For a quick setup using [tlaverdure/laravel-echo-server][link-echo-server] websockets, follow the instructions at the bottom.
-- Future support for `pusher.js` library, along with the [Laravel Websockets][link-laravel-websockets] package will be added.
+- Our compiled `NotifyManager.js` uses laravel echo, with the `pusher-js` library. 
+- For websockets, this package supports [pusher.com][link-pusher] directly, or the drop-in replacement [laravel-websockets][link-laravel-websockets].
+  - Instructions are located below for setting up the websocket implementation of your choosing.
 
 ---
 
@@ -47,7 +44,15 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
 ```php
 'site_name' => env('MESSENGER_SITE_NAME', 'Messenger'),
 
-'socket_endpoint' => env('MESSENGER_SOCKET_ENDPOINT', config('app.url')),
+'websocket' => [
+    'pusher' => env('MESSENGER_SOCKET_PUSHER', false), //Set true if you are using the real pusher.com
+    'host' => env('MESSENGER_SOCKET_HOST', 'localhost'),
+    'auth_endpoint' => env('MESSENGER_SOCKET_AUTH_ENDPOINT', '/api/broadcasting/auth'),
+    'key' => env('MESSENGER_SOCKET_KEY'),
+    'port' => env('MESSENGER_SOCKET_PORT', 6001),
+    'use_tsl' => env('MESSENGER_SOCKET_TLS', false),
+    'cluster' => env('MESSENGER_SOCKET_CLUSTER'), //Only set when connecting to the real pusher.com
+],
 
 'routing' => [
     'domain' => null,
@@ -56,16 +61,95 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
     'invite_middleware' => ['web', 'auth.optional', 'messenger.provider'],
 ],
 ```
-- Site name is used in our views to inject the name in the navbar.
-- Socket endpoint is used for your socket.io endpoint.
-- For the web routes, you may choose your desired endpoint domain, prefix and middleware.
+- `site_name` is used in our views to inject the name in the navbar.
+- `websocket`:
+  - When using the real `pusher.com`, you need to set `pusher` to `true`, add in your `cluster`, and your `key`.
+  - When using `laravel-websockets`, you leave `pusher` to `false`, ignore `cluster`, and set your `host`, `port`, and `key`.
+  - The `auth_endpoint` is for your laravel's backend to authorize access to our messenger channels. The default `messenger.php` config prefixes the channel routes with `api`, hence our default config above uses `/api/broadcasting/auth` when not set.
+- `routing` you may choose your desired endpoint domain, prefix and middleware.
   - Invite join web route you can define separate middleware from the rest of the web routes, as you may want a guest allowed to view that page.
 - The default `messenger.provider` middleware is included with `Messenger Core` and simply sets the active messenger provider by grabbing the authed user from `$request->user()`.
 
 ---
 
-# Using Laravel Echo Server
-- TODO
+# Using [Pusher][link-pusher]
+- After you have your pusher credentials ready, you should install the pusher SDK:
+
+```bash
+composer require pusher/pusher-php-server
+```
+
+- Once installed, set your `.env` variables:
+
+***Default `broadcasting.php` config***
+
+```php
+'pusher' => [
+    'driver' => 'pusher',
+    'key' => env('PUSHER_APP_KEY'),
+    'secret' => env('PUSHER_APP_SECRET'),
+    'app_id' => env('PUSHER_APP_ID'),
+    'options' => [
+        'cluster' => env('PUSHER_APP_CLUSTER'),
+        'useTLS' => false,
+    ],
+], 
+```
+***`.env` keys for both pusher and our UI***
+
+```dotenv
+BROADCAST_DRIVER=pusher
+PUSHER_APP_ID=YourPusherId
+PUSHER_APP_KEY=YourPusherKey
+PUSHER_APP_SECRET=YourPusherSecret
+PUSHER_APP_CLUSTER=YourPusherCluster
+MESSENGER_SOCKET_PUSHER=true
+MESSENGER_SOCKET_KEY="${PUSHER_APP_KEY}"
+MESSENGER_SOCKET_CLUSTER="${PUSHER_APP_CLUSTER}"
+```
+- You are all set! Our UI will connect to your pusher account. Be sure to enable `client events` in your pusher account if you want our client to client events enabled.
+
+---
+
+# Using [laravel-websockets][link-laravel-websockets]
+- First, you need to have installed the websocket package (This package has been tested using laravel-websockets v1.12).
+- Ideally, you should follow the official [Installation Documentation][link-laravel-websockets-install] from `beyondcode` if you are doing a fresh installation.
+
+```bash
+composer require beyondcode/laravel-websockets "^1.12"
+```
+
+- Once you have installed and configured the websocket package, set your `.env` variables and update the default pusher config:
+
+***Updated `broadcasting.php` config per `beyondcode's` documentation***
+
+```php
+'pusher' => [
+    'driver' => 'pusher',
+    'key' => env('PUSHER_APP_KEY'),
+    'secret' => env('PUSHER_APP_SECRET'),
+    'app_id' => env('PUSHER_APP_ID'),
+    'options' => [
+        'cluster' => env('PUSHER_APP_CLUSTER'),
+        'encrypted' => true,
+        'host' => 'localhost',
+        'port' => 6001,
+        'scheme' => 'http'
+    ],
+],
+```
+***`.env` keys for both `laravel-websockets` and our UI***
+
+```dotenv
+BROADCAST_DRIVER=pusher
+PUSHER_APP_ID=MakeYourID
+PUSHER_APP_KEY=MakeYourKey
+PUSHER_APP_SECRET=MakeYourSecret
+MESSENGER_SOCKET_HOST=localhost
+MESSENGER_SOCKET_KEY="${PUSHER_APP_KEY}"
+```
+- You are all set! Our UI will connect to your server running `php artisan websockets:serve`. Be sure to enable `client events` in your `laravel-websockets` config if you want our client to client events enabled.
+
 
 [link-messenger]: https://github.com/RTippin/messenger
 [link-author]: https://github.com/rtippin
@@ -77,5 +161,6 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
 [link-downloads]: https://packagist.org/packages/rtippin/messenger-ui
 [link-license]: https://packagist.org/packages/rtippin/messenger-ui
 [link-styleci]: https://styleci.io/repos/379743201
-[link-echo-server]: https://github.com/tlaverdure/laravel-echo-server
 [link-laravel-websockets]: https://beyondco.de/docs/laravel-websockets/getting-started/introduction
+[link-laravel-websockets-install]: https://beyondco.de/docs/laravel-websockets/getting-started/installation
+[link-pusher]: https://pusher.com/
