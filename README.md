@@ -64,7 +64,7 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
     'domain' => null,
     'prefix' => 'messenger',
     'middleware' => ['web', 'auth', 'messenger.provider'],
-    'invite_middleware' => ['web', 'auth.optional', 'messenger.provider'],
+    'invite_middleware' => ['web', 'messenger.provider'],
 ],
 ```
 - `site_name` is used in our views to inject the name in the navbar.
