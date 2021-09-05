@@ -7,13 +7,21 @@
 
 ---
 
+---
+![Preview](https://raw.githubusercontent.com/RTippin/messenger/1.x/docs/images/image1.png?raw=true)
+---
+
+---
+
 ## Ready-made UI and web routes for use with [rtippin/messenger][link-messenger]
 
 ### Notes
-- This package provides web routes that pertain to the `messenger` core. No authentication routes/system will be setup for you.
+- This package provides web routes and a published UI to consume `messenger's` API. No authentication routes/system will be setup for you.
 - Our compiled `NotifyManager.js` uses laravel echo, with the `pusher-js` library. 
 - For websockets, this package supports [pusher.com][link-pusher] directly, or the drop-in replacement [laravel-websockets][link-laravel-websockets].
   - Instructions are located below for setting up the websocket implementation of your choosing.
+- After publishing our `views`, you may wish to edit them to fit your needs.
+- Future versions planned will be crafted in `react`.
 
 ---
 
@@ -45,13 +53,13 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
 'site_name' => env('MESSENGER_SITE_NAME', 'Messenger'),
 
 'websocket' => [
-    'pusher' => env('MESSENGER_SOCKET_PUSHER', false), //Set true if you are using the real pusher.com
+    'pusher' => env('MESSENGER_SOCKET_PUSHER', false),
     'host' => env('MESSENGER_SOCKET_HOST', 'localhost'),
     'auth_endpoint' => env('MESSENGER_SOCKET_AUTH_ENDPOINT', '/api/broadcasting/auth'),
     'key' => env('MESSENGER_SOCKET_KEY'),
     'port' => env('MESSENGER_SOCKET_PORT', 6001),
     'use_tsl' => env('MESSENGER_SOCKET_TLS', false),
-    'cluster' => env('MESSENGER_SOCKET_CLUSTER'), //Only set when connecting to the real pusher.com
+    'cluster' => env('MESSENGER_SOCKET_CLUSTER'),
 ],
 
 'routing' => [
@@ -68,7 +76,7 @@ $ php artisan vendor:publish --tag=messenger-ui.assets --force
   - The `auth_endpoint` is for your laravel's backend to authorize access to our messenger channels. The default `messenger.php` config prefixes the channel routes with `api`, hence our default config above uses `/api/broadcasting/auth` when not set.
 - `routing` you may choose your desired endpoint domain, prefix and middleware.
   - Invite join web route you can define separate middleware from the rest of the web routes, as you may want a guest allowed to view that page.
-- The default `messenger.provider` middleware is included with `Messenger Core` and simply sets the active messenger provider by grabbing the authed user from `$request->user()`.
+  - The default `messenger.provider` middleware is included with `messenger` and simply sets the active messenger provider by grabbing the authenticated user from `$request->user()`.
 
 ---
 
@@ -107,7 +115,7 @@ MESSENGER_SOCKET_PUSHER=true
 MESSENGER_SOCKET_KEY="${PUSHER_APP_KEY}"
 MESSENGER_SOCKET_CLUSTER="${PUSHER_APP_CLUSTER}"
 ```
-- You are all set! Our UI will connect to your pusher account. Be sure to enable `client events` in your pusher account if you want our client to client events enabled.
+- You are all set! Our UI will connect to your pusher account. Be sure to enable `client events` within your pusher account if you want our client to client events enabled.
 
 ---
 
