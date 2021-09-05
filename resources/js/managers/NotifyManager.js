@@ -6,8 +6,7 @@
 
 import Echo from 'laravel-echo';
 
-// window.Pusher = require('pusher-js');
-window.io = require('socket.io-client');
+window.Pusher = require('pusher-js');
 
 window.NotifyManager = (function () {
     var opt = {
@@ -150,45 +149,36 @@ window.NotifyManager = (function () {
             if(!Messenger.common().websockets) return;
             opt.socket.forced_disconnect = false;
             opt.socket.Echo = new Echo({
-                broadcaster : 'socket.io',
+                broadcaster : 'pusher',
                 host : Messenger.common().SOCKET,
+                key: Messenger.common().SOCKET_KEY,
+                wsHost: Messenger.common().SOCKET,
+                wsPort: Messenger.common().SOCKET_PORT,
+                forceTLS: Messenger.common().SOCKET_TLS,
+                disableStats: true,
+                authEndpoint: Messenger.common().SOCKET_AUTH_ENDPOINT,
             });
-            opt.socket.Echo.connector.socket.on('connect', function(){
-                opt.socket.socket_status = true;
-                broadcaster.PrivateChannel();
-                if(reconnected) broadcaster.reconnected(true)
+            opt.socket.Echo.connector.pusher.connection.bind('connected', () => {
+                    opt.socket.socket_status = true;
+                    broadcaster.PrivateChannel();
+                    if(reconnected) broadcaster.reconnected(true)
             });
-            opt.socket.Echo.connector.socket.on('reconnect', broadcaster.reconnected);
-            opt.socket.Echo.connector.socket.on('disconnect', function(){
+            opt.socket.Echo.connector.pusher.connection.bind('disconnected', () => {
+                localStorage.removeItem('pusherTransportNonTLS');
                 opt.socket.socket_status = false;
                 if(Messenger.common().modules.includes('ThreadManager')) ThreadManager.state().socketStatusCheck();
-                if(CallManager.state().initialized) CallManager.channel().disconnected()
+                if(CallManager.state().initialized) CallManager.channel().disconnected();
+                if(!opt.socket.forced_disconnect){
+                    setTimeout(function(){
+                        broadcaster.Echo(true)
+                    }, 2000)
+                }
             });
-            opt.socket.Echo.connector.socket.on('subscription_error', broadcaster.subscriptionError)
         },
         reconnected : function(full){
             if(typeof full === "boolean" && !full) broadcaster.heartBeat(false, true, true);
             if(Messenger.common().modules.includes('ThreadManager')) ThreadManager.state().reConnected(typeof full === "boolean" && full);
             if(CallManager.state().initialized) CallManager.channel().reconnected(typeof full === "boolean" && full)
-        },
-        subscriptionError : function(e){
-            let private_channel = /private-/i, presence_channel = /presence-/i;
-            if(private_channel.test(e)){
-                broadcaster.Disconnect();
-                if(opt.socket.private_channel_retries === 2) return;
-                opt.socket.private_channel_retries++;
-                broadcaster.Echo(true)
-            }
-            if(presence_channel.test(e)){
-                broadcaster.Disconnect();
-                if(opt.socket.presence_channel_retries === 2){
-                    opt.socket.private_channel_retries = 0;
-                    broadcaster.Echo(false);
-                    return;
-                }
-                opt.socket.presence_channel_retries++;
-                broadcaster.Echo(true)
-            }
         },
         Disconnect : function(){
             if(opt.socket.Echo !== null) opt.socket.Echo.disconnect();
@@ -220,6 +210,9 @@ window.NotifyManager = (function () {
             .listen('.demoted.admin', methods.demotedAdmin)
             .listen('.permissions.updated', methods.permissionsUpdated)
             .listen('.reaction.added', methods.incomingReact)
+            .error(() => {
+                opt.socket.socket_status = false;
+            });
         },
         heartBeat : function(state, check, gather){
             let payload = function(){

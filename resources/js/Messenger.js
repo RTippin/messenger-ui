@@ -5,6 +5,10 @@ window.Messenger = (function () {
         API : null,
         WEB : null,
         SOCKET : null,
+        SOCKET_KEY : null,
+        SOCKET_AUTH_ENDPOINT : null,
+        SOCKET_PORT : 6001,
+        SOCKET_TLS : false,
         env : 'production',
         websockets : true,
         lockout : false,
@@ -47,6 +51,10 @@ window.Messenger = (function () {
                 opt.API = arg.common.api_endpoint + '/';
                 opt.WEB = arg.common.web_endpoint;
                 opt.SOCKET = arg.common.socket_endpoint;
+                opt.SOCKET_KEY = arg.common.socket_key;
+                opt.SOCKET_AUTH_ENDPOINT = arg.common.socket_auth_endpoint;
+                opt.SOCKET_PORT = arg.common.socket_port;
+                opt.SOCKET_TLS = arg.common.socket_tls;
                 opt.APP_NAME = arg.common.app_name;
                 opt.mobile = arg.common.mobile;
                 opt.dark_mode = arg.common.dark_mode;
@@ -712,6 +720,10 @@ window.Messenger = (function () {
                 API : opt.API,
                 WEB : opt.WEB,
                 SOCKET : opt.SOCKET,
+                SOCKET_KEY : opt.SOCKET_KEY,
+                SOCKET_AUTH_ENDPOINT : opt.SOCKET_AUTH_ENDPOINT,
+                SOCKET_PORT : opt.SOCKET_PORT,
+                SOCKET_TLS : opt.SOCKET_TLS,
                 provider_alias : opt.provider_alias,
                 provider_id : opt.provider_id,
                 provider_model : opt.provider_model,

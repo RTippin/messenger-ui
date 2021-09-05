@@ -626,7 +626,6 @@ window.ThreadManager = (function () {
             .listen('.message.edited', methods.renderUpdatedMessage)
             .listen('.reaction.added', methods.updateNewReaction)
             .listen('.reaction.removed', methods.updateRemoveReaction)
-
         }
     },
     Health = {
