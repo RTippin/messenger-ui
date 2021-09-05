@@ -7,9 +7,7 @@
 
 ---
 
----
 ![Preview](https://raw.githubusercontent.com/RTippin/messenger/1.x/docs/images/image1.png?raw=true)
----
 
 ---
 
