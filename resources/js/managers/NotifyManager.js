@@ -182,6 +182,7 @@ window.NotifyManager = (function () {
                 key: Messenger.common().SOCKET_KEY,
                 wsHost: Messenger.common().SOCKET,
                 wsPort: Messenger.common().SOCKET_PORT,
+                wssPort: Messenger.common().SOCKET_PORT,
                 forceTLS: Messenger.common().SOCKET_TLS,
                 disableStats: true,
                 authEndpoint: Messenger.common().SOCKET_AUTH_ENDPOINT,
