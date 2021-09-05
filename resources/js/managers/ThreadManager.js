@@ -2352,28 +2352,28 @@ window.ThreadManager = (function () {
                 expires_at = null;
             switch (expire) {
                 case 1:
-                    expires_at = dayjs().utc().add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss');
+                    expires_at = dayjs().utc().add(30, 'minute').format('YYYY-MM-DD HH:mm:ss');
                 break;
                 case 2:
-                    expires_at = dayjs().utc().add(1, 'hours').format('YYYY-MM-DD HH:mm:ss');
+                    expires_at = dayjs().utc().add(1, 'hour').format('YYYY-MM-DD HH:mm:ss');
                 break;
                 case 3:
-                    expires_at = dayjs().utc().add(6, 'hours').format('YYYY-MM-DD HH:mm:ss');
+                    expires_at = dayjs().utc().add(6, 'hour').format('YYYY-MM-DD HH:mm:ss');
                 break;
                 case 4:
-                    expires_at = dayjs().utc().add(12, 'hours').format('YYYY-MM-DD HH:mm:ss');
+                    expires_at = dayjs().utc().add(12, 'hour').format('YYYY-MM-DD HH:mm:ss');
                 break;
                 case 5:
-                    expires_at = dayjs().utc().add(1, 'days').format('YYYY-MM-DD HH:mm:ss');
+                    expires_at = dayjs().utc().add(1, 'day').format('YYYY-MM-DD HH:mm:ss');
                 break;
                 case 6:
-                    expires_at = dayjs().utc().add(1, 'weeks').format('YYYY-MM-DD HH:mm:ss');
+                    expires_at = dayjs().utc().add(1, 'week').format('YYYY-MM-DD HH:mm:ss');
                 break;
                 case 7:
-                    expires_at = dayjs().utc().add(2, 'weeks').format('YYYY-MM-DD HH:mm:ss');
+                    expires_at = dayjs().utc().add(2, 'week').format('YYYY-MM-DD HH:mm:ss');
                 break;
                 case 8:
-                    expires_at = dayjs().utc().add(1, 'months').format('YYYY-MM-DD HH:mm:ss');
+                    expires_at = dayjs().utc().add(1, 'month').format('YYYY-MM-DD HH:mm:ss');
                 break;
             }
             Messenger.alert().fillModal({
