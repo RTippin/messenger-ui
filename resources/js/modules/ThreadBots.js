@@ -60,7 +60,7 @@ window.ThreadBots = (function () {
                     fail_alert : true
                 })
             };
-            Messenger.alert().Modal({
+            let modal = {
                 icon : 'robot',
                 backdrop_ctrl : false,
                 theme : 'dark',
@@ -71,7 +71,14 @@ window.ThreadBots = (function () {
                 h4 : false,
                 size : 'lg',
                 onReady : gather
-            });
+            };
+            if(opt.thread.options.manage_bots){
+                modal.cb_btn_txt = 'Add Bot';
+                modal.cb_btn_icon = 'robot';
+                modal.cb_btn_theme = 'success';
+                modal.callback = methods.addBot;
+            }
+            Messenger.alert().Modal(modal);
         },
         addBot : function(){
             Messenger.alert().Modal({
@@ -970,7 +977,6 @@ window.ThreadBots = (function () {
     return {
         init : mounted.Initialize,
         viewBots : methods.viewBots,
-        addBot : methods.addBot,
         viewBot : methods.viewBot,
         editBot : methods.editBot,
         removeAvatar : methods.removeAvatar,

@@ -114,6 +114,8 @@ window.ThreadTemplates = (function () {
                         return '<em>'+data.resources.latest_message.owner.name+'</em> : <i class="fas fa-file-download"></i> Sent a file';
                     case 3:
                         return '<em>'+data.resources.latest_message.owner.name+'</em> : <i class="fas fa-music"></i> Sent an audio file';
+                    case 4:
+                        return '<em>'+data.resources.latest_message.owner.name+'</em> : <i class="fas fa-video"></i> Sent a video';
                     default:
                         return '<em>'+data.resources.latest_message.owner.name+'</em> : ' + Messenger.format().shortcodeToImage(data.resources.latest_message.body)
                 }
@@ -221,6 +223,24 @@ window.ThreadTemplates = (function () {
             }
             return html
         },
+        thread_videos : function(start, data){
+            let html = '';
+            if(start){
+                html += '<div class="inbox mx-n2"><ul id="video_history" class="inbox messages-list">';
+            }
+            data.data.forEach(function (message) {
+                html += templates.video_item(message)
+            });
+            if(start){
+                html += '</ul></div>';
+            }
+            if(!data.meta.final_page){
+                html += '<div id="video_paginate_btn" class="col-12 text-center mt-4"><hr>' +
+                    '<button onclick="ThreadManager.load().threadVideos(true, \''+data.meta.next_page_id+'\')" type="button" class="btn btn-primary">Load More <i class="fas fa-arrow-alt-circle-down"></i></button>' +
+                    '</div>';
+            }
+            return html
+        },
         message_edit_history : function(data){
             let html = '<div class="mx-n2"><ul id="edit_history">';
             data.forEach(function (message) {
@@ -250,6 +270,16 @@ window.ThreadTemplates = (function () {
                 '<div class="media-body thread_body_li"><div class="header d-inline"><small><div class="float-right date"><time class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></div></small>' +
                 '<div class="from font-weight-bold">'+data.owner.name+'</div></div><div class="description"><em><i class="fas fa-music"></i> '+data.body+'</em></div></div></div></a>' +
                 '<div class="col-12 text-center"><audio controls preload="none" class="message-audio-player"><source src="'+data.audio+'?stream=true"></audio></div>' +
+                '</li>'
+        },
+        video_item : function(data){
+            return '<li title="'+Messenger.format().escapeHtml(data.owner.name)+' on '+Messenger.format().makeHumanTime(data.created_at)+'" class="thread_list_item mb-2">' +
+                '<div class="thread-list-status"><span class="shadow-sm badge badge-pill badge-success">Video <i class="fas fa-video"></i></span></div> '+
+                '<a target="_blank" href="'+data.video+'">' +
+                '<div class="media"><div class="media-left media-middle"><img src="'+data.owner.avatar.sm+'" class="media-object rounded-circle thread-list-avatar avatar-is-offline" /></div>' +
+                '<div class="media-body thread_body_li"><div class="header d-inline"><small><div class="float-right date"><time class="timeago" datetime="'+data.created_at+'">'+Messenger.format().makeTimeAgo(data.created_at)+'</time></div></small>' +
+                '<div class="from font-weight-bold">'+data.owner.name+'</div></div><div class="description"><em><i class="fas fa-video"></i> '+data.body+'</em></div></div></div></a>' +
+                '<div class="col-12 text-center"><div class="embed-responsive embed-responsive-16by9 my-3"><video class="embed-responsive-item" controls preload="metadata"><source src="'+data.video+'?stream=true"></video></div></div>' +
                 '</li>'
         },
         messenger_search_friend : function(profile){
@@ -299,6 +329,7 @@ window.ThreadTemplates = (function () {
                     case 1:
                     case 2:
                     case 3:
+                    case 4:
                         return '<div class="h3 spinner-grow text-danger" style="width: 4rem; height: 4rem;" role="status">\n' +
                                 '  <span class="sr-only">Uploading...</span>\n' +
                                 '</div>';
@@ -315,6 +346,8 @@ window.ThreadTemplates = (function () {
                         return nolink === true ? '<i class="fas fa-file-download"></i> '+data.body : '<a href="'+data.document+'" target="_blank"><i class="fas fa-file-download"></i> '+data.body+'</a>';
                     case 3:
                         return nolink === true ? '<i class="fas fa-music"></i> '+data.body :  '<a href="'+data.audio+'" target="_blank"><i class="fas fa-music"></i> '+data.body+'</a>';
+                    case 4:
+                        return nolink === true ? '<i class="fas fa-video"></i> '+data.body :  '<a href="'+data.video+'" target="_blank"><i class="fas fa-video"></i> '+data.body+'</a>';
                     default:
                         return methods.format_message_body(data.body, true);
                 }
@@ -333,6 +366,9 @@ window.ThreadTemplates = (function () {
                         return '<a href="'+data.audio+'" target="_blank"><i class="fas fa-volume-up"></i> Audio Message</a><hr>' +audio;
                     }
                     return '<a href="'+data.audio+'" target="_blank"><i class="fas fa-volume-up"></i> '+data.body+'</a><hr>' +audio;
+                case 4:
+                    let video = '<div class="embed-responsive embed-responsive-16by9 my-2"><video class="embed-responsive-item" controls preload="metadata"><source src="'+data.video+'?stream=true"></video></div>';
+                    return '<a href="'+data.video+'" target="_blank"><i class="fas fa-video"></i> '+data.body+'</a><hr>' +video;
                 default:
                     let body = methods.format_message_body(data.body);
 
@@ -617,10 +653,8 @@ window.ThreadTemplates = (function () {
                 'data-placement="bottom" class="btn btn-lg text-secondary btn-light pt-1 pb-0 px-2" type="button"><i class="fas fa-hand-rock fa-2x"></i></button>',
             invites = '<a class="dropdown-item" onclick="ThreadManager.group().viewInviteGenerator(); return false;" id="threadOptionLink" href="#"><i class="fas fa-link"></i> Invitations</a>\n',
             admin = '<a class="dropdown-item" onclick="ThreadManager.group().viewSettings(); return false;" id="threadOptionLink" href="#"><i class="fas fa-cog"></i> Settings</a>\n',
-            add_participants = '<a class="dropdown-item" onclick="ThreadManager.group().addParticipants(); return false;" id="addParticipantLink" href="#"><i class="fas fa-user-plus"></i> Add participants</a>',
-            view_participants = '<a class="dropdown-item" onclick="ThreadManager.group().viewParticipants(); return false;" id="viewParticipantLink" href="#"><i class="fas fa-users"></i> '+(data.options.admin && !data.locked ? 'Manage' : 'View')+' participants</a>\n',
-            add_bots = '<a class="dropdown-item" onclick="ThreadBots.addBot(); return false;" id="addBotsLink" href="#"><i class="fas fa-user-plus"></i> Add Bots</a>',
-            view_bots = '<a class="dropdown-item" onclick="ThreadBots.viewBots(); return false;" id="viewBotsLink" href="#"><i class="fas fa-robot"></i> '+(data.options.manage_bots ? 'Manage' : 'View')+' Bots</a>\n';
+            view_participants = '<a class="dropdown-item" onclick="ThreadManager.group().viewParticipants(); return false;" id="viewParticipantLink" href="#"><i class="fas fa-users"></i> Participants</a>\n',
+            view_bots = '<a class="dropdown-item" onclick="ThreadBots.viewBots(); return false;" id="viewBotsLink" href="#"><i class="fas fa-robot"></i> Chat Bots</a>\n';
 
             return '<div id="thread_header_area"><div class="dropdown float-right">\n' +
                     templates.thread_socket_error(true)+
@@ -631,9 +665,7 @@ window.ThreadTemplates = (function () {
                     '        <div class="dropdown-header py-0 h6 text-dark"><img id="group_avatar_'+data.id+'" alt="Group Image" class="show_group_avatar_'+data.id+' rounded-circle small_img" src="'+data.avatar.sm+'"/>' +
                     '           <span id="group_name_area">'+data.name+'</span></div>\n' +
                         templates.thread_resource_dropdown() +
-                    (!data.locked && data.options.add_participants ? add_participants : '')+
                     view_participants +
-                    (!data.locked && data.options.manage_bots ? add_bots : '')+
                     (!data.locked && data.options.chat_bots ? view_bots : '')+
                     (!data.locked && data.options.invitations ? invites : '')+
                     (!data.locked && data.options.admin ? admin : '')+
@@ -655,6 +687,7 @@ window.ThreadTemplates = (function () {
                 '<a onclick="ThreadManager.load().threadDocuments(); return false;" class="dropdown-item" href="#"><i class="fas fa-file-alt"></i> Documents</a>' +
                 '<a onclick="ThreadManager.load().threadImages(); return false;" class="dropdown-item" href="#"><i class="fas fa-images"></i> Images</a>' +
                 '<a onclick="ThreadManager.load().threadAudio(); return false;" class="dropdown-item" href="#"><i class="fas fa-music"></i> Audio</a>' +
+                '<a onclick="ThreadManager.load().threadVideos(); return false;" class="dropdown-item" href="#"><i class="fas fa-video"></i> Videos</a>' +
                 '<a onclick="ThreadManager.load().threadLogs(); return false;" class="dropdown-item" href="#"><i class="fas fa-database"></i> Logs</a>' +
                 '<div class="dropdown-divider"></div>\n';
         },
@@ -1339,7 +1372,7 @@ window.ThreadTemplates = (function () {
                 '                            </div>\n' +
                 '                        </form>\n' +
                 '                    </div>\n' +
-                '                    <input class="NS" multiple type="file" name="doc_file" id="doc_file" accept=".csv,.doc,.docx,.json,.pdf,.ppt,.pptx,.rar,.rtf,.txt,.xls,.xlsx,.xml,.zip,.7z,.aac,.mp3,.oga,.wav,.weba,webm,image/*">\n' +
+                '                    <input class="NS" multiple type="file" name="doc_file" id="doc_file" accept=".csv,.doc,.docx,.json,.pdf,.ppt,.pptx,.rar,.rtf,.txt,.xls,.xlsx,.xml,.zip,.7z,.aac,.mp3,.oga,.wav,.weba,webm,image/*,video/*">\n' +
                 '                    <input class="NS" id="thread_avatar_image_file" type="file" name="group_avatar_image_file" accept="image/*">\n' +
                 '                </div>\n' +
                 '            </div>\n' +

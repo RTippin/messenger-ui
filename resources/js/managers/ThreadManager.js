@@ -749,7 +749,7 @@ window.ThreadManager = (function () {
                     toast : true,
                     theme : 'info'
                 });
-                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
             }
         },
         demotedAdmin : function(thread_id){
@@ -760,7 +760,7 @@ window.ThreadManager = (function () {
                     toast : true,
                     theme : 'info'
                 });
-                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
             }
         },
         permissionsUpdated : function(thread_id){
@@ -771,7 +771,7 @@ window.ThreadManager = (function () {
                     toast : true,
                     theme : 'info'
                 });
-                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
             }
         },
         threadApproval : function(thread_id, approved){
@@ -929,7 +929,7 @@ window.ThreadManager = (function () {
                     theme : 'info'
                 })
             }
-            LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+            LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
         },
         groupAvatarState : function(settings){
             if(!Messenger.isProvider(settings.sender.provider_id, null, settings.sender.provider_alias)){
@@ -940,7 +940,7 @@ window.ThreadManager = (function () {
                     theme : 'info'
                 })
             }
-            LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+            LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
         },
         threadScrollBottom : function(force, check){
             if(!opt.elements.the_thread) return false;
@@ -1568,6 +1568,16 @@ window.ThreadManager = (function () {
                 'audio/wav',
                 'audio/webm',
             ],
+            videos = [
+                'video/x-msvideo',
+                'video/mp4',
+                'video/ogg',
+                'video/webm',
+                'video/3gpp',
+                'video/3gpp2',
+                'video/x-ms-wmv',
+                'video/quicktime',
+            ],
             files = [
                 'application/pdf',
                 'application/msword',
@@ -1601,6 +1611,10 @@ window.ThreadManager = (function () {
                 type.number = 3;
                 type.input = 'audio';
                 type.path = '/audio';
+            } else if(videos.includes(file.type)){
+                type.number = 4;
+                type.input = 'video';
+                type.path = '/videos';
             }
             if(type.number === 0){
                 Messenger.alert().Alert({
@@ -1769,7 +1783,7 @@ window.ThreadManager = (function () {
         },
         messageStatusState : function(message, sound){
             opt.thread.click_to_read = false;
-            let forceScroll = (Messenger.isProvider(message.owner_id, message.owner_type) || ThreadTemplates.youtubeRegex().test(message.body)),
+            let forceScroll = (Messenger.isProvider(message.owner_id, message.owner_type) || ThreadTemplates.youtubeRegex().test(message.body) || message.type === 4),
                 didScroll = methods.threadScrollBottom(forceScroll, false),
                 hide = function () {
                     opt.elements.new_msg_alert.hide();
@@ -2286,7 +2300,7 @@ window.ThreadManager = (function () {
                 })
             };
             if(reload) return gather();
-            Messenger.alert().Modal({
+            let modal = {
                 icon : 'users',
                 backdrop_ctrl : false,
                 theme : 'dark',
@@ -2297,7 +2311,14 @@ window.ThreadManager = (function () {
                 h4 : false,
                 size : 'lg',
                 onReady : gather
-            });
+            };
+            if(!opt.thread.lockout && opt.thread._thread.options.add_participants){
+                modal.cb_btn_txt = 'Add Participants';
+                modal.cb_btn_icon = 'user-plus';
+                modal.cb_btn_theme = 'success';
+                modal.callback = groups.addParticipants;
+            }
+            Messenger.alert().Modal(modal);
         },
         viewInviteGenerator : function(){
             Messenger.alert().Modal({
@@ -2821,7 +2842,7 @@ window.ThreadManager = (function () {
                             title : "You muted " + opt.thread.name,
                             toast : true
                         });
-                        LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                        LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
                     },
                     fail_alert : true,
                     close_modal : true
@@ -2852,7 +2873,7 @@ window.ThreadManager = (function () {
                         title : "You un-muted " + opt.thread.name,
                         toast : true
                     });
-                    LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                    LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
                 },
                 fail_alert : true
             })
@@ -3086,6 +3107,41 @@ window.ThreadManager = (function () {
                 }
             })
         },
+        threadVideos : function(paginate, page){
+            if(!opt.thread.id) return;
+            if(paginate){
+                $("#video_paginate_btn").html(Messenger.alert().loader(true));
+                Messenger.xhr().request({
+                    route : Messenger.common().API+'threads/'+opt.thread.id+'/videos/page/' + page,
+                    success : function(data){
+                        $("#video_paginate_btn").remove();
+                        $("#video_history").append(ThreadTemplates.render().thread_videos(false, data))
+                    }
+                })
+                return;
+            }
+            Messenger.alert().Modal({
+                size : 'lg',
+                backdrop_ctrl : false,
+                overflow : true,
+                theme : 'dark',
+                icon : 'video',
+                title: 'Loading Videos...',
+                pre_loader: true,
+                h4: false,
+                onReady: function () {
+                    Messenger.xhr().request({
+                        route : Messenger.common().API+'threads/'+opt.thread.id+'/videos',
+                        success : function(data){
+                            Messenger.alert().fillModal({
+                                title : opt.thread.name+' Shared Videos',
+                                body : data.data.length ? ThreadTemplates.render().thread_videos(true, data) : '<h3 class="text-center mt-2"><span class="badge badge-pill badge-secondary"><i class="fas fa-video"></i> No Videos</span></h3>'
+                            });
+                        }
+                    })
+                }
+            })
+        },
         thread : function(thread_id, success){
             Messenger.xhr().request({
                 route : Messenger.common().API+'threads/' + thread_id,
@@ -3214,12 +3270,8 @@ window.ThreadManager = (function () {
             mounted.reset(true);
             opt.thread.initializing = true;
             opt.thread._id = arg.thread_id;
-            let params = '/load/messages|participants';
-            if( ! arg.hasOwnProperty('read')){
-                params += '|mark-read';
-            }
             Messenger.xhr().request({
-                route : Messenger.common().API + 'threads/' + arg.thread_id + params,
+                route : Messenger.common().API + 'threads/' + arg.thread_id + '/load',
                 success : function(data){
                     data.group
                         ? methods.initiateGroup(arg, data, noHistory)
