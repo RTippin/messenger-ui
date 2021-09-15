@@ -1783,7 +1783,7 @@ window.ThreadManager = (function () {
         },
         messageStatusState : function(message, sound){
             opt.thread.click_to_read = false;
-            let forceScroll = (Messenger.isProvider(message.owner_id, message.owner_type) || ThreadTemplates.youtubeRegex().test(message.body)),
+            let forceScroll = (Messenger.isProvider(message.owner_id, message.owner_type) || ThreadTemplates.youtubeRegex().test(message.body) || message.type === 4),
                 didScroll = methods.threadScrollBottom(forceScroll, false),
                 hide = function () {
                     opt.elements.new_msg_alert.hide();
@@ -2300,7 +2300,7 @@ window.ThreadManager = (function () {
                 })
             };
             if(reload) return gather();
-            Messenger.alert().Modal({
+            let modal = {
                 icon : 'users',
                 backdrop_ctrl : false,
                 theme : 'dark',
@@ -2311,7 +2311,14 @@ window.ThreadManager = (function () {
                 h4 : false,
                 size : 'lg',
                 onReady : gather
-            });
+            };
+            if(!opt.thread.lockout && opt.thread._thread.options.add_participants){
+                modal.cb_btn_txt = 'Add Participants';
+                modal.cb_btn_icon = 'user-plus';
+                modal.cb_btn_theme = 'success';
+                modal.callback = groups.addParticipants;
+            }
+            Messenger.alert().Modal(modal);
         },
         viewInviteGenerator : function(){
             Messenger.alert().Modal({
@@ -3094,6 +3101,41 @@ window.ThreadManager = (function () {
                             Messenger.alert().fillModal({
                                 title : opt.thread.name+' Shared Audio',
                                 body : data.data.length ? ThreadTemplates.render().thread_audio(true, data) : '<h3 class="text-center mt-2"><span class="badge badge-pill badge-secondary"><i class="fas fa-music"></i> No Audio</span></h3>'
+                            });
+                        }
+                    })
+                }
+            })
+        },
+        threadVideos : function(paginate, page){
+            if(!opt.thread.id) return;
+            if(paginate){
+                $("#video_paginate_btn").html(Messenger.alert().loader(true));
+                Messenger.xhr().request({
+                    route : Messenger.common().API+'threads/'+opt.thread.id+'/videos/page/' + page,
+                    success : function(data){
+                        $("#video_paginate_btn").remove();
+                        $("#video_history").append(ThreadTemplates.render().thread_videos(false, data))
+                    }
+                })
+                return;
+            }
+            Messenger.alert().Modal({
+                size : 'lg',
+                backdrop_ctrl : false,
+                overflow : true,
+                theme : 'dark',
+                icon : 'video',
+                title: 'Loading Videos...',
+                pre_loader: true,
+                h4: false,
+                onReady: function () {
+                    Messenger.xhr().request({
+                        route : Messenger.common().API+'threads/'+opt.thread.id+'/videos',
+                        success : function(data){
+                            Messenger.alert().fillModal({
+                                title : opt.thread.name+' Shared Videos',
+                                body : data.data.length ? ThreadTemplates.render().thread_videos(true, data) : '<h3 class="text-center mt-2"><span class="badge badge-pill badge-secondary"><i class="fas fa-video"></i> No Videos</span></h3>'
                             });
                         }
                     })
