@@ -17,7 +17,7 @@ class ViewPortalController
     }
 
     /**
-     * @param string $thread
+     * @param  string  $thread
      * @return Application|Factory|View
      */
     public function showThread(string $thread)
@@ -29,8 +29,8 @@ class ViewPortalController
     }
 
     /**
-     * @param string $alias
-     * @param string $id
+     * @param  string  $alias
+     * @param  string  $id
      * @return Application|Factory|View
      */
     public function showCreatePrivate(string $alias, string $id)
@@ -43,8 +43,8 @@ class ViewPortalController
     }
 
     /**
-     * @param string $thread
-     * @param string $call
+     * @param  string  $thread
+     * @param  string  $call
      * @return Application|Factory|View
      */
     public function showVideoCall(string $thread, string $call)
@@ -56,7 +56,7 @@ class ViewPortalController
     }
 
     /**
-     * @param string $invite
+     * @param  string  $invite
      * @return Application|Factory|View
      */
     public function showJoinWithInvite(string $invite)
