@@ -13,6 +13,7 @@ class MessengerUiServiceProvider extends ServiceProvider
      * Bootstrap any package services.
      *
      * @return void
+     *
      * @throws BindingResolutionException
      */
     public function boot(): void
@@ -73,7 +74,7 @@ class MessengerUiServiceProvider extends ServiceProvider
     /**
      * Get the Messenger API route group configuration array.
      *
-     * @param bool $invite
+     * @param  bool  $invite
      * @return array
      */
     private function webRouteConfiguration(bool $invite = false): array
