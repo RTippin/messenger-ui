@@ -114,6 +114,8 @@ window.ThreadTemplates = (function () {
                         return '<em>'+data.resources.latest_message.owner.name+'</em> : <i class="fas fa-file-download"></i> Sent a file';
                     case 3:
                         return '<em>'+data.resources.latest_message.owner.name+'</em> : <i class="fas fa-music"></i> Sent an audio file';
+                    case 4:
+                        return '<em>'+data.resources.latest_message.owner.name+'</em> : <i class="fas fa-file-video"></i> Sent a video';
                     default:
                         return '<em>'+data.resources.latest_message.owner.name+'</em> : ' + Messenger.format().shortcodeToImage(data.resources.latest_message.body)
                 }
@@ -299,6 +301,7 @@ window.ThreadTemplates = (function () {
                     case 1:
                     case 2:
                     case 3:
+                    case 4:
                         return '<div class="h3 spinner-grow text-danger" style="width: 4rem; height: 4rem;" role="status">\n' +
                                 '  <span class="sr-only">Uploading...</span>\n' +
                                 '</div>';
@@ -315,6 +318,8 @@ window.ThreadTemplates = (function () {
                         return nolink === true ? '<i class="fas fa-file-download"></i> '+data.body : '<a href="'+data.document+'" target="_blank"><i class="fas fa-file-download"></i> '+data.body+'</a>';
                     case 3:
                         return nolink === true ? '<i class="fas fa-music"></i> '+data.body :  '<a href="'+data.audio+'" target="_blank"><i class="fas fa-music"></i> '+data.body+'</a>';
+                    case 4:
+                        return nolink === true ? '<i class="fas fa-file-video"></i> '+data.body :  '<a href="'+data.video+'" target="_blank"><i class="fas fa-file-video"></i> '+data.body+'</a>';
                     default:
                         return methods.format_message_body(data.body, true);
                 }
@@ -333,6 +338,9 @@ window.ThreadTemplates = (function () {
                         return '<a href="'+data.audio+'" target="_blank"><i class="fas fa-volume-up"></i> Audio Message</a><hr>' +audio;
                     }
                     return '<a href="'+data.audio+'" target="_blank"><i class="fas fa-volume-up"></i> '+data.body+'</a><hr>' +audio;
+                case 4:
+                    let video = '<div class="embed-responsive embed-responsive-16by9 my-2"><video class="embed-responsive-item" controls preload="metadata"><source src="'+data.video+'?stream=true"></video></div>';
+                    return '<a href="'+data.video+'" target="_blank"><i class="fas fa-file-video"></i> '+data.body+'</a><hr>' +video;
                 default:
                     let body = methods.format_message_body(data.body);
 
@@ -1339,7 +1347,7 @@ window.ThreadTemplates = (function () {
                 '                            </div>\n' +
                 '                        </form>\n' +
                 '                    </div>\n' +
-                '                    <input class="NS" multiple type="file" name="doc_file" id="doc_file" accept=".csv,.doc,.docx,.json,.pdf,.ppt,.pptx,.rar,.rtf,.txt,.xls,.xlsx,.xml,.zip,.7z,.aac,.mp3,.oga,.wav,.weba,webm,image/*">\n' +
+                '                    <input class="NS" multiple type="file" name="doc_file" id="doc_file" accept=".csv,.doc,.docx,.json,.pdf,.ppt,.pptx,.rar,.rtf,.txt,.xls,.xlsx,.xml,.zip,.7z,.aac,.mp3,.oga,.wav,.weba,webm,image/*,video/*">\n' +
                 '                    <input class="NS" id="thread_avatar_image_file" type="file" name="group_avatar_image_file" accept="image/*">\n' +
                 '                </div>\n' +
                 '            </div>\n' +

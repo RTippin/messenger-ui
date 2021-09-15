@@ -749,7 +749,7 @@ window.ThreadManager = (function () {
                     toast : true,
                     theme : 'info'
                 });
-                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
             }
         },
         demotedAdmin : function(thread_id){
@@ -760,7 +760,7 @@ window.ThreadManager = (function () {
                     toast : true,
                     theme : 'info'
                 });
-                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
             }
         },
         permissionsUpdated : function(thread_id){
@@ -771,7 +771,7 @@ window.ThreadManager = (function () {
                     toast : true,
                     theme : 'info'
                 });
-                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
             }
         },
         threadApproval : function(thread_id, approved){
@@ -929,7 +929,7 @@ window.ThreadManager = (function () {
                     theme : 'info'
                 })
             }
-            LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+            LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
         },
         groupAvatarState : function(settings){
             if(!Messenger.isProvider(settings.sender.provider_id, null, settings.sender.provider_alias)){
@@ -940,7 +940,7 @@ window.ThreadManager = (function () {
                     theme : 'info'
                 })
             }
-            LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+            LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
         },
         threadScrollBottom : function(force, check){
             if(!opt.elements.the_thread) return false;
@@ -1568,6 +1568,16 @@ window.ThreadManager = (function () {
                 'audio/wav',
                 'audio/webm',
             ],
+            videos = [
+                'video/x-msvideo',
+                'video/mp4',
+                'video/ogg',
+                'video/webm',
+                'video/3gpp',
+                'video/3gpp2',
+                'video/x-ms-wmv',
+                'video/quicktime',
+            ],
             files = [
                 'application/pdf',
                 'application/msword',
@@ -1601,6 +1611,10 @@ window.ThreadManager = (function () {
                 type.number = 3;
                 type.input = 'audio';
                 type.path = '/audio';
+            } else if(videos.includes(file.type)){
+                type.number = 4;
+                type.input = 'video';
+                type.path = '/videos';
             }
             if(type.number === 0){
                 Messenger.alert().Alert({
@@ -2821,7 +2835,7 @@ window.ThreadManager = (function () {
                             title : "You muted " + opt.thread.name,
                             toast : true
                         });
-                        LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                        LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
                     },
                     fail_alert : true,
                     close_modal : true
@@ -2852,7 +2866,7 @@ window.ThreadManager = (function () {
                         title : "You un-muted " + opt.thread.name,
                         toast : true
                     });
-                    LoadIn.initiate_thread({thread_id : opt.thread.id, force : true, read : false})
+                    LoadIn.initiate_thread({thread_id : opt.thread.id, force : true})
                 },
                 fail_alert : true
             })
@@ -3214,12 +3228,8 @@ window.ThreadManager = (function () {
             mounted.reset(true);
             opt.thread.initializing = true;
             opt.thread._id = arg.thread_id;
-            let params = '/load/messages|participants';
-            if( ! arg.hasOwnProperty('read')){
-                params += '|mark-read';
-            }
             Messenger.xhr().request({
-                route : Messenger.common().API + 'threads/' + arg.thread_id + params,
+                route : Messenger.common().API + 'threads/' + arg.thread_id + '/load',
                 success : function(data){
                     data.group
                         ? methods.initiateGroup(arg, data, noHistory)
