@@ -2,25 +2,23 @@
 
 namespace RTippin\MessengerUi\Http\Controllers;
 
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\View\View;
 
 class ViewPortalController
 {
     /**
-     * @return Application|Factory|View
+     * @return View
      */
-    public function index()
+    public function index(): View
     {
         return view('messenger::portal')->with('mode', 5);
     }
 
     /**
      * @param  string  $thread
-     * @return Application|Factory|View
+     * @return View
      */
-    public function showThread(string $thread)
+    public function showThread(string $thread): View
     {
         return view('messenger::portal')->with([
             'mode' => 0,
@@ -31,9 +29,9 @@ class ViewPortalController
     /**
      * @param  string  $alias
      * @param  string  $id
-     * @return Application|Factory|View
+     * @return View
      */
-    public function showCreatePrivate(string $alias, string $id)
+    public function showCreatePrivate(string $alias, string $id): View
     {
         return view('messenger::portal')->with([
             'mode' => 3,
@@ -45,9 +43,9 @@ class ViewPortalController
     /**
      * @param  string  $thread
      * @param  string  $call
-     * @return Application|Factory|View
+     * @return View
      */
-    public function showVideoCall(string $thread, string $call)
+    public function showVideoCall(string $thread, string $call): View
     {
         return view('messenger::video')->with([
             'threadId' => $thread,
@@ -57,9 +55,9 @@ class ViewPortalController
 
     /**
      * @param  string  $invite
-     * @return Application|Factory|View
+     * @return View
      */
-    public function showJoinWithInvite(string $invite)
+    public function showJoinWithInvite(string $invite): View
     {
         return view('messenger::invitation')->with([
             'code' => $invite,
