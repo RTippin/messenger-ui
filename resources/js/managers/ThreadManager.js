@@ -54,6 +54,7 @@ window.ThreadManager = (function () {
             temp_data : null
         },
         timers : {
+            mark_read_timeout : null,
             recent_bobble_timeout : null,
             socket_interval : null,
             remove_typing_interval : null,
@@ -212,6 +213,7 @@ window.ThreadManager = (function () {
             if(opt.socket.chat) opt.socket.chat.unsubscribe();
             if(opt.timers.remove_typing_interval) clearInterval(opt.timers.remove_typing_interval);
             if(opt.timers.socket_interval) clearInterval(opt.timers.socket_interval);
+            if(opt.timers.mark_read_timeout) clearTimeout(opt.timers.mark_read_timeout);
             if(opt.timers.recent_bobble_timeout) clearTimeout(opt.timers.recent_bobble_timeout);
             if(opt.timers.bobble_refresh_interval) clearInterval(opt.timers.bobble_refresh_interval);
             if(opt.timers.private_bobble_refresh_timeout) clearTimeout(opt.timers.private_bobble_refresh_timeout);
@@ -274,6 +276,7 @@ window.ThreadManager = (function () {
                     temp_data : null
                 },
                 timers : {
+                    mark_read_timeout : null,
                     recent_bobble_timeout : null,
                     socket_interval : null,
                     remove_typing_interval : null,
@@ -976,10 +979,16 @@ window.ThreadManager = (function () {
             opt.elements.new_msg_alert.hide();
             methods.updateThread({thread_id : opt.thread.id}, false, true, false);
             if(opt.storage.messages.length) methods.seenMessage(opt.storage.messages[0].id);
-            Messenger.xhr().request({
-                route : Messenger.common().API+'threads/'+opt.thread.id+'/mark-read',
-                fail : null
-            })
+            let runMarkRead = () => {
+                Messenger.xhr().request({
+                    route : Messenger.common().API+'threads/'+opt.thread.id+'/mark-read',
+                    fail : null
+                })
+            };
+            if(opt.timers.mark_read_timeout){
+                clearTimeout(opt.timers.mark_read_timeout)
+            }
+            opt.timers.mark_read_timeout = setTimeout(runMarkRead, 1000)
         },
         loadDataTable : function(elm, special){
             if(opt.elements.data_table) opt.elements.data_table.destroy();
