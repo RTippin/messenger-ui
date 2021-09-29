@@ -94,25 +94,7 @@ window.NotifyManager = (function () {
 
                 },
                 activate : function(){
-                    if(CallManager.state().initialized){
-                        window.location.reload();
-                        return;
-                    }
-                    Messenger.xhr().payload({
-                        route : Messenger.common().API + 'heartbeat',
-                        data : {
-                            away : false
-                        },
-                        success : function(data){
-                            methods.manageHeartbeatData(data);
-                            opt.settings.is_away = false;
-                            broadcaster.heartBeat(true, false, false);
-                            broadcaster.Echo(true);
-                        },
-                        fail : function(){
-                            window.reload();
-                        }
-                    });
+                    window.location.reload();
                 }
             });
             InactivityManager.setup({

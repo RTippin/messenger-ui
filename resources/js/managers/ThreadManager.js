@@ -1558,80 +1558,23 @@ window.ThreadManager = (function () {
             }
         },
         sendUploadFiles : function(file, getType, audioMessage){
-            let type = {
-                number : 0,
-                input : null,
-                path : null
-            },
-            images = [
-                'image/jpeg',
-                'image/png',
-                'image/bmp',
-                'image/gif',
-                'image/webp',
-            ],
-            audio = [
-                'audio/aac',
-                'audio/mpeg',
-                'audio/ogg',
-                'audio/wav',
-                'audio/webm',
-            ],
-            videos = [
-                'video/x-msvideo',
-                'video/mp4',
-                'video/ogg',
-                'video/webm',
-                'video/3gpp',
-                'video/3gpp2',
-                'video/x-ms-wmv',
-                'video/quicktime',
-            ],
-            files = [
-                'application/pdf',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/vnd.ms-powerpoint',
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                'application/x-rar-compressed',
-                'application/x-rar',
-                'application/zip',
-                'application/x-7z-compressed',
-                'application/x-zip-compressed',
-                'application/zip-compressed',
-                'multipart/x-zip',
-                'text/plain',
-                'text/xml',
-                'application/rtf',
-                'application/json',
-                'text/csv',
-            ];
-            if(images.includes(file.type)){
+            let type = {};
+            if(file.type.match('image.*')){
                 type.number = 1;
                 type.input = 'image';
                 type.path = '/images';
-            } else if(files.includes(file.type)){
-                type.number = 2;
-                type.input = 'document';
-                type.path = '/documents';
-            } else if(audio.includes(file.type)){
+            } else if(file.type.match('audio.*')){
                 type.number = 3;
                 type.input = 'audio';
                 type.path = '/audio';
-            } else if(videos.includes(file.type)){
+            } else if(file.type.match('video.*')){
                 type.number = 4;
                 type.input = 'video';
                 type.path = '/videos';
-            }
-            if(type.number === 0){
-                Messenger.alert().Alert({
-                    title : 'File type not supported',
-                    toast : true,
-                    theme : 'warning'
-                });
-                return;
+            } else {
+                type.number = 2;
+                type.input = 'document';
+                type.path = '/documents';
             }
             if(getType === true){
                 return type.input;

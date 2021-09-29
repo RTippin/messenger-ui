@@ -600,28 +600,6 @@ window.Messenger = (function () {
                     title : 'Error',
                     body : body
                 })
-            },
-            oldFormError = function(arg){
-                if(typeof arg.response.data.errors.forms === 'object'){
-                    let theStack = '<ul class="'+(arg.type === 2 ? 'p-0 ml-3' : '')+'">';
-                    $.each( arg.response.data.errors.forms, function( key, value ) {
-                        $.each( value, function( key2, errm ) {
-                            theStack += '<li>' + errm + '</li>';
-                        });
-                    });
-                    theStack += '</ul>';
-                    if(arg.type === 2){
-                        errToast(theStack, !("no_close" in arg));
-                        return;
-                    }
-                    errModal(theStack);
-                    return;
-                }
-                if(arg.type === 2){
-                    errToast(arg.response.data.errors.forms, true);
-                    return;
-                }
-                errModal(arg.response.data.errors.forms);
             };
             buttons.removeLoader();
             if(!arg || arg && typeof arg.response === 'undefined'){
@@ -635,11 +613,6 @@ window.Messenger = (function () {
             if(arg.response.status === 500){
                 errToast(errMessages(), true);
                 return;
-            }
-            if(typeof arg.response.data !== 'undefined'
-                && typeof arg.response.data.errors !== 'undefined'
-                && typeof arg.response.data.errors.forms !== 'undefined'){
-                return oldFormError(arg)
             }
             if(typeof arg.response.data === 'undefined' ||
                 typeof arg.response.data.message === 'undefined'){
