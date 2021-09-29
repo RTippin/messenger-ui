@@ -28,17 +28,17 @@
 ### Via Composer
 
 ``` bash
-$ composer require rtippin/messenger-ui
+composer require rtippin/messenger-ui
 ```
 
 ### Publish Assets and Config
 - This will publish our JS assets, images, views, and config.
 ```bash
-$ php artisan messenger:ui:publish
+php artisan messenger:ui:publish
 ```
 - When using composer to update this package, we recommend republishing our JS/CSS assets:
 ```bash
-$ php artisan vendor:publish --tag=messenger-ui.assets --force
+php artisan vendor:publish --tag=messenger-ui.assets --force
 ```
 
 ---
