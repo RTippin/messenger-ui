@@ -3,6 +3,9 @@ window.ThreadTemplates = (function () {
         youtubeRegex : function(){
             return /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*?[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig
         },
+        giphyRegex : function(){
+            return /https?:\/\/(?:media?[0-9A-Z-]\.giphy\.com\/media\/([^ \/\n]+)\/giphy\.gif|i\.giphy\.com\/([^ /\n]+)\.gif|giphy\.com\/gifs\/(?:.*-)?([^ /\n]+))*/ig
+        },
         makeLinks : function(body){
             return autolinker.link(body)
         },
@@ -16,11 +19,27 @@ window.ThreadTemplates = (function () {
             }
             return body.replace(methods.youtubeRegex(), html);
         },
+        makeGiphy : function(body){
+            let match = methods.giphyRegex().exec(body)?.slice(1).find(item => item !== undefined);
+            if(!match){
+                return body;
+            }
+            return '<a target="_blank" href="https://media.giphy.com/media/'+match+'/giphy.gif">' +
+                '<img class="msg_image NS img-fluid" src="https://media.giphy.com/media/'+match+'/giphy.gif" />' +
+                '<div class="h3 spinner-grow text-info" style="width: 4rem; height: 4rem;" role="status"><span class="sr-only">loading...</span></div>'+
+                '</a>'
+        },
         format_message_body : function(body, skipExtra){
             if(skipExtra === true){
                 return Messenger.format().shortcodeToImage(body)
             }
-            return methods.makeLinks(methods.makeYoutube(Messenger.format().shortcodeToImage(body)));
+            return methods.makeLinks(
+                methods.makeGiphy(
+                    methods.makeYoutube(
+                        Messenger.format().shortcodeToImage(body)
+                    )
+                )
+            );
         },
         switch_mobile_view : function (power) {
             let nav = $("#FS_navbar"), main_section = $("#FS_main_section"), msg_sidebar = $("#message_sidebar_container"), msg_content = $("#message_content_container");
@@ -1404,6 +1423,7 @@ window.ThreadTemplates = (function () {
             return templates
         },
         mobile : methods.switch_mobile_view,
-        youtubeRegex : methods.youtubeRegex
+        youtubeRegex : methods.youtubeRegex,
+        giphyRegex : methods.giphyRegex,
     };
 }());
