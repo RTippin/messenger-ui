@@ -1230,7 +1230,9 @@ window.ThreadManager = (function () {
                 $(e.target).siblings('.spinner-grow').remove();
                 $(e.target).removeClass('msg_image NS');
                 if(scroll) methods.threadScrollBottom(true, false);
-                if(e.type === 'error') e.target.src = [window.location.protocol, '//', window.location.host].join('')+'/vendor/messenger/image404.png';
+                if(e.type === 'error'){
+                    $(e.target).replaceWith('<span class="badge badge-pill badge-danger">Image failed to load.</span>')
+                }
             },
             loadEmoji = function (e) {
                 if(scroll) methods.threadScrollBottom(true, false);

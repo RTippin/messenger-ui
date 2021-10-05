@@ -415,7 +415,7 @@ window.Messenger = (function () {
             };
             img.onerror = function() {
                 alerts.fillModal({
-                    body : '<div class="text-center"><img src="/vendor/messenger/images/image404.png" class="img-fluid rounded" /></div>'
+                    body : '<div class="text-center"><span class="badge badge-pill badge-danger">Image failed to load.</span></div>'
                 });
             };
             img.src = avatar;
