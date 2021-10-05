@@ -4,7 +4,7 @@ window.ThreadTemplates = (function () {
             return /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*?[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig
         },
         giphyRegex : function(){
-            return /https?:\/\/(?:media?[0-9A-Z-]\.giphy\.com\/media\/([^ \/\n]+)\/giphy\.gif|i\.giphy\.com\/([^ /\n]+)\.gif|giphy\.com\/gifs\/(?:.*-)?([^ /\n]+))*/ig
+            return /https?:\/\/(?:i\.giphy\.com\/|media\.giphy\.com\/media|giphy\.com\/gifs\/(?:\S*-|[^-])|media?[0-9A-Z-]\.giphy\.com\/media\/)([^- /\n]+)(?:\.\bgif\b|\b\/giphy\.gif\b|\n|(?=\s|$))/ig
         },
         makeLinks : function(body){
             return autolinker.link(body)
@@ -20,14 +20,13 @@ window.ThreadTemplates = (function () {
             return body.replace(methods.youtubeRegex(), html);
         },
         makeGiphy : function(body){
-            let match = methods.giphyRegex().exec(body)?.slice(1).find(item => item !== undefined);
-            if(!match){
-                return body;
-            }
-            return '<a target="_blank" href="https://media.giphy.com/media/'+match+'/giphy.gif">' +
-                '<img class="msg_image NS img-fluid" src="https://media.giphy.com/media/'+match+'/giphy.gif" />' +
+            let html = '<div class="col-12 p-1">' +
+                '<a target="_blank" href="https://media.giphy.com/media/$1/giphy.gif">' +
+                '<img class="msg_image NS img-fluid" src="https://media.giphy.com/media/$1/giphy.gif" />' +
                 '<div class="h3 spinner-grow text-info" style="width: 4rem; height: 4rem;" role="status"><span class="sr-only">loading...</span></div>'+
-                '</a>'
+                '</a>' +
+                '</div>';
+            return body.replace(methods.giphyRegex(), html);
         },
         format_message_body : function(body, skipExtra){
             if(skipExtra === true){
