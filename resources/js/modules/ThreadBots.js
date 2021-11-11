@@ -211,6 +211,9 @@ window.ThreadBots = (function () {
                 case 'reply':
                     extra = handlers.replies(opt.current_action.payload);
                 break;
+                case 'invitations':
+                    extra = handlers.invite_lifetime(opt.current_action.payload);
+                break;
                 case 'wiki':
                 case 'youtube':
                     extra = handlers.result_limit(opt.current_action.payload);
@@ -219,7 +222,7 @@ window.ThreadBots = (function () {
             opt.current_bot_action_container.html(
                 handlers.start(opt.current_action.handler, true) +
                 handlers.base(opt.current_action) +
-                handlers.triggers(opt.current_action.triggers, opt.current_action.handler.triggers) +
+                handlers.triggers(opt.current_action.triggers, opt.current_action.handler.triggers, opt.current_action.handler.match ?? opt.current_action.match) +
                 handlers.match(opt.current_action.match, opt.current_action.handler.match) +
                 extra +
                 handlers.end(true)
@@ -271,6 +274,9 @@ window.ThreadBots = (function () {
                 case 'reply':
                     extra = handlers.replies();
                 break;
+                case 'invitations':
+                    extra = handlers.invite_lifetime();
+                break;
                 case 'wiki':
                 case 'youtube':
                     extra = handlers.result_limit()
@@ -279,7 +285,7 @@ window.ThreadBots = (function () {
             opt.current_bot_action_container.html(
                 handlers.start(opt.current_handler, false) +
                 handlers.base() +
-                handlers.triggers(null, opt.current_handler.triggers) +
+                handlers.triggers(null, opt.current_handler.triggers, opt.current_handler.match) +
                 handlers.match(null, opt.current_handler.match) +
                 extra +
                 handlers.end(false)
@@ -313,16 +319,16 @@ window.ThreadBots = (function () {
             })
         },
         makeHandlerFormData : function(handler){
-            let form = {};
+            let form = {}, match = $("#g_s_action_match").val();
             form.handler = handler.alias;
             form.cooldown = parseInt($("#g_s_bot_cooldown").val());
             form.enabled = $("#g_s_action_enabled").is(":checked");
             form.admin_only = $("#g_s_admin_only_action").is(":checked");
-            if(!handler.triggers){
+            if(!handler.triggers && ![handler.match, match].includes('any')){
                 form.triggers = [$("#g_s_action_triggers").val()];
             }
             if(!handler.match){
-                form.match = $("#g_s_action_match").val();
+                form.match = match;
             }
             if(handler.alias === 'react'){
                 form.reaction = $("#g_s_bot_reaction").val();
@@ -340,6 +346,9 @@ window.ThreadBots = (function () {
                 replies.forEach((reply) => {
                     if(reply.trim().length) form.replies.push(reply)
                 });
+            }
+            if(handler.alias === 'invitations'){
+                form.lifetime_minutes = parseInt($("#g_s_bot_inv_lifetime").val());
             }
             if(['wiki', 'youtube'].includes(handler.alias)){
                 form.limit = parseInt($("#g_s_bot_result_limit").val());
@@ -450,6 +459,14 @@ window.ThreadBots = (function () {
                 },
                 fail_alert : true
             }, 'delete');
+        },
+        updateTriggersForm : function(){
+            let container = $("#bot_action_triggers_form");
+            if($("#g_s_action_match").val() === 'any'){
+                container.addClass('NS')
+            } else {
+                container.removeClass('NS')
+            }
         }
     },
     templates = {
@@ -683,14 +700,17 @@ window.ThreadBots = (function () {
                 table_bot = '</tbody></table></div></div></div>',
                 table_fill = '';
             let action_fill = (action) => {
-                let triggers = '',
+                let triggers = '<span class="badge badge-secondary font-italic">N/A</span>',
                     options = '<td><div class="dropdown float-right">' +
                         '<button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fas fa-cog"></i></button>' +
                         '    <div class="dropdown-menu dropdown-menu-right">' +
                         '       <a class="dropdown-item" onclick="ThreadBots.editAction(\''+action.id+'\'); return false;" href="#" title="Edit"><i class="fas fa-edit"></i> Edit</a>' +
                         '       <a class="dropdown-item" onclick="ThreadBots.removeAction(\''+action.id+'\'); return false;" href="#" title="Delete"><i class="fas fa-trash-alt"></i> Delete</a>' +
                         '</span></div></div></td>';
-                action.triggers.forEach((trigger) => triggers += '<span class="badge badge-light mr-1">'+trigger+'</span>');
+                if(action.triggers && action.triggers.length){
+                    triggers = '';
+                    action.triggers.forEach((trigger) => triggers += '<span class="badge badge-light mr-1">'+trigger+'</span>');
+                }
                 return '<tr id="row_'+action.id+'">\n' +
                     '  <td class="h5 nowrap">'+action.handler.name+'</td>'+
                     '  <td class="h5">\n' +
@@ -723,13 +743,19 @@ window.ThreadBots = (function () {
                     let replies = '<ul class="p-0 my-0 mr-0 ml-1">';
                     action.payload.replies.forEach((reply) => replies += '<li>'+Messenger.format().shortcodeToImage(reply)+'</li>');
                     return replies + '</ul>';
+                case 'invitations':
+                    if(action.payload){
+                        return 'Lifetime of '+action.payload.lifetime_minutes+' minutes';
+                    }
+                break;
                 case 'youtube':
                 case 'wiki':
                     if(action.payload){
                         return 'Max of '+action.payload.limit+' results';
                     }
+                break;
             }
-            return 'N/A';
+            return '<span class="badge badge-secondary font-italic">N/A</span>';
         },
         view_handlers : function(handlers){
             let table_top = '<div class="col-12 my-3 text-center h2"><span class="badge badge-light"><i class="fas fa-list"></i> Select an action:</span></div>' +
@@ -754,7 +780,7 @@ window.ThreadBots = (function () {
                     '<button onclick="ThreadBots.reloadBotActions()" type="button" class="btn btn-info">Cancel <i class="fas fa-undo"></i></button>' +
                     '</div>';
             let handler_fill = (handler) => {
-                let triggers = 'N\A';
+                let triggers = '<span class="badge badge-secondary font-italic">N/A</span>';
                 if(handler.triggers && handler.triggers.length){
                     triggers = '';
                     handler.triggers.forEach((trigger) => triggers += '<span class="badge badge-light mr-1">'+trigger+'</span>');
@@ -766,7 +792,7 @@ window.ThreadBots = (function () {
                           (handler.unique ? '<span class="badge badge-success"><i class="fas fa-check"></i></span>' : '<span class="badge badge-danger"><i class="fas fa-times"></i></span>') +
                     '  </td>\n' +
                     '  <td class="h5 nowrap">'+triggers+'</td>'+
-                    '  <td class="h5">'+(handler.match ?? 'N/A')+'</td>'+
+                    '  <td class="h5">'+(handler.match ?? '<span class="badge badge-secondary font-italic">N/A</span>')+'</td>'+
                     '  <td class="h5"><button type="button" class="btn btn-sm btn-primary">Select <i class="fas fa-server"></i></button></td>'+
                     '</tr>'
             };
@@ -811,7 +837,7 @@ window.ThreadBots = (function () {
                 admin_only = values.admin_only;
             }
             return '<div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
-                '    <div class="col-12"><h5 class="font-weight-bold">Cooldown [in seconds]:</h5></div>' +
+                '    <div class="col-12"><h5 class="font-weight-bold">Cooldown [ in seconds ]:</h5></div>' +
                 '    <div class="input-group input-group-lg col-12 mb-0">\n' +
                 '        <div class="input-group-prepend">\n' +
                 '            <span class="input-group-text"><i class="fas fa-clock"></i></span>\n' +
@@ -850,10 +876,11 @@ window.ThreadBots = (function () {
                 '        </table>\n' +
                 '    </div>';
         },
-        triggers : function(values, overrides){
+        triggers : function(values, overrides, match){
             let triggers = '',
                 readonly = false,
-                text = '[Separate multiple triggers using commas ( , ) or the pipe ( | )]';
+                hidden = false,
+                text = '[ Separate multiple triggers using commas ( , ) or the pipe ( | ) ]';
             if(overrides && overrides.length){
                 triggers = overrides.join('|');
                 readonly = true;
@@ -861,7 +888,12 @@ window.ThreadBots = (function () {
             } else if(values && values.length) {
                 triggers = values.join('|');
             }
-            return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
+            if(match === 'any'){
+                hidden = true;
+            }
+            return '<div id="bot_action_triggers_form" class="'+(hidden ? 'NS' : '')+'">' +
+                '<hr>' +
+                '<div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
                 '    <div class="col-12"><h5 class="font-weight-bold">Triggers: '+text+'</h5></div>' +
                 '    <div class="input-group input-group-lg col-12 mb-0">\n' +
                 '        <div class="input-group-prepend">\n' +
@@ -869,6 +901,7 @@ window.ThreadBots = (function () {
                 '         </div>\n' +
                 '         <input '+(readonly ? 'readonly' : '')+' autocomplete="off" class="form-control font-weight-bold shadow-sm" id="g_s_action_triggers" placeholder="!command | hello | sentence as a trigger" name="bot-triggers-'+Date.now()+'" required value="'+triggers+'">' +
                 '     </div>\n' +
+                '   </div>' +
                 '</div>';
         },
         match : function(value, override){
@@ -884,7 +917,8 @@ window.ThreadBots = (function () {
             return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
                 '<div class="col-12"><h5 class="font-weight-bold">Match Method: '+(readonly ? text : '')+'</h5></div>' +
                 '<div class="col-12 mb-3"><div class="col-12 col-lg-8 offset-lg-2">' +
-                '<select id="g_s_action_match" class="custom-select custom-select-lg" '+(readonly ? 'disabled' : '')+'>\n' +
+                '<select onchange="ThreadBots.updateTriggers()" id="g_s_action_match" class="custom-select custom-select-lg" '+(readonly ? 'disabled' : '')+'>\n' +
+                '  <option value="any" '+(match === "any" ? 'selected' : '')+'>any</option>\n' +
                 '  <option value="contains" '+(match === "contains" ? 'selected' : '')+'>contains</option>\n' +
                 '  <option value="contains:caseless" '+(match === "contains:caseless" ? 'selected' : '')+'>contains:caseless</option>\n' +
                 '  <option value="contains:any" '+(match === "contains:any" ? 'selected' : '')+'>contains:any</option>\n' +
@@ -897,6 +931,7 @@ window.ThreadBots = (function () {
                 '</div></div>'+
                 '<div class="col-12 h6">' +
                 '    <ul>' +
+                '        <li>any - The action will be triggered for any message sent.</li>' +
                 '        <li>contains - The trigger can be anywhere within a message. Cannot be part of or inside another word.</li>' +
                 '        <li>contains:caseless - Same as "contains", but is case insensitive.</li>' +
                 '        <li>contains:any - The trigger can be anywhere within a message, including inside another word.</li>' +
@@ -914,7 +949,7 @@ window.ThreadBots = (function () {
                 value = Messenger.format().shortcodeToUnicode(reaction);
             }
             return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
-                '    <div class="col-12"><h5 class="font-weight-bold">Reaction: [emoji]</h5></div>' +
+                '    <div class="col-12"><h5 class="font-weight-bold">Reaction: [ emoji ]</h5></div>' +
                 '    <div class="input-group input-group-lg col-12 col-lg-6 offset-lg-3 mb-0">\n' +
                 '         <input onclick="EmojiPicker.botActionReact()" readonly autocomplete="off" class="form-control font-weight-bold shadow-sm" id="g_s_bot_reaction" placeholder="Pick an emoji!" name="bot-reaction-'+Date.now()+'" required value="'+value+'">' +
                 '         <div class="input-group-append">\n' +
@@ -934,7 +969,7 @@ window.ThreadBots = (function () {
                 reply5 = payload.replies[4] ? Messenger.format().shortcodeToUnicode(payload.replies[4]) : '';
             }
             return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pb-3 pt-2 px-2 shadow-sm">\n' +
-                '    <div class="col-12"><h5 class="font-weight-bold">Replies: [One required. Max of 5]</h5></div>' +
+                '    <div class="col-12"><h5 class="font-weight-bold">Replies: [ One required. Max of 5 ]</h5></div>' +
                 '        <label class="control-label" for="g_replies_table"> - Quote matching message? When enabled, the first reply will use the matching message within the reply.</label>' +
                 '        <table id="g_replies_table" class="table table-sm table-hover">\n' +
                 '            <tbody>\n' +
@@ -964,12 +999,27 @@ window.ThreadBots = (function () {
                 limit = payload.limit;
             }
             return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
-                '    <div class="col-12"><h5 class="font-weight-bold">Max number of results: [10 max]</h5></div>' +
+                '    <div class="col-12"><h5 class="font-weight-bold">Max number of results: [ 10 max ]</h5></div>' +
+                '    <div class="input-group input-group-lg col-12 mb-0">\n' +
+                '        <div class="input-group-prepend">\n' +
+                '            <span class="input-group-text"><i class="fas fa-list-ol"></i></span>\n' +
+                '         </div>\n' +
+                '         <input type="number" autocomplete="off" min="1" max="10" class="form-control font-weight-bold shadow-sm" id="g_s_bot_result_limit" placeholder="Results Limit" name="bot-limit-'+Date.now()+'" required value="'+limit+'">' +
+                '     </div>\n' +
+                '</div>'
+        },
+        invite_lifetime : function(payload){
+            let lifetime = 15;
+            if(payload){
+                lifetime = payload.lifetime_minutes;
+            }
+            return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
+                '    <div class="col-12"><h5 class="font-weight-bold">Invite lifetime: [ between 5 and 60 minutes ]</h5></div>' +
                 '    <div class="input-group input-group-lg col-12 mb-0">\n' +
                 '        <div class="input-group-prepend">\n' +
                 '            <span class="input-group-text"><i class="fas fa-clock"></i></span>\n' +
                 '         </div>\n' +
-                '         <input type="number" autocomplete="off" min="1" max="10" class="form-control font-weight-bold shadow-sm" id="g_s_bot_result_limit" placeholder="Bot Cooldown" name="bot-limit-'+Date.now()+'" required value="'+limit+'">' +
+                '         <input type="number" autocomplete="off" min="5" max="60" class="form-control font-weight-bold shadow-sm" id="g_s_bot_inv_lifetime" placeholder="Invite Lifetime" name="bot-invite-lifetime-'+Date.now()+'" required value="'+lifetime+'">' +
                 '     </div>\n' +
                 '</div>'
         }
@@ -988,6 +1038,7 @@ window.ThreadBots = (function () {
         editAction : methods.editAction,
         updateAction : methods.updateAction,
         removeAction : methods.removeAction,
+        updateTriggers : methods.updateTriggersForm,
         state : function(){
             return opt;
         },
