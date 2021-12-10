@@ -465,10 +465,12 @@ window.ThreadBots = (function () {
                 data : {
                     alias : alias,
                 },
-                success : function(msg){
-                    Messenger.alert().fillModal({
-                        body : '<div class="card-body bg-primary shadow rounded"><h4>'+msg.message+'</h4></div>',
-                        title : 'Installing Bot...'
+                success : function(bot){
+                    methods.viewBot(bot.id);
+                    Messenger.alert().Alert({
+                        toast : true,
+                        theme : 'success',
+                        title : bot.name+' was successfully installed.'
                     });
                 },
                 fail_alert : true,
