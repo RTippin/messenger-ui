@@ -597,6 +597,12 @@ window.ThreadBots = (function () {
                 '</div>';
         },
         bot_packages : function(packages){
+            if(!packages.length){
+                return '<div class="card mt-3">' +
+                    '<div class="card-body bg-warning shadow rounded text-center">' +
+                    '<h4>There are no available bot packages to install.</h4>' +
+                    '</div></div>';
+            }
             let html = '';
             let package_fill = (packaged_bot) => {
                 let install_list = '';
