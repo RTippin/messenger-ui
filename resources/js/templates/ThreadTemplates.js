@@ -639,6 +639,7 @@ window.ThreadTemplates = (function () {
                 case 101:
                 case 102:
                 case 103:
+                case 104:
                     icon = 'fas fa-robot';
                 break;
             }

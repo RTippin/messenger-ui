@@ -73,12 +73,50 @@ window.ThreadBots = (function () {
                 onReady : gather
             };
             if(opt.thread.options.manage_bots){
-                modal.cb_btn_txt = 'Add Bot';
+                modal.cb_btn_txt = 'Create or Install Bot';
                 modal.cb_btn_icon = 'robot';
                 modal.cb_btn_theme = 'success';
-                modal.callback = methods.addBot;
+                modal.callback = methods.createOrInstall;
             }
             Messenger.alert().Modal(modal);
+        },
+        createOrInstall : function(){
+            Messenger.alert().Modal({
+                icon : 'robot',
+                backdrop_ctrl : false,
+                theme : 'dark',
+                title : 'Create or Install Bot',
+                h4 : false,
+                size : 'md',
+                body : templates.create_or_install(),
+            });
+        },
+        viewBotPackages : function(){
+            if (!methods.setThread()) return;
+            let gather = () => {
+                Messenger.xhr().request({
+                    route : Messenger.common().API + 'threads/' + opt.thread.id + '/bots/packages',
+                    success : function(packages){
+                        Messenger.alert().fillModal({
+                            body : templates.bot_packages(packages),
+                            title : 'Bot Packages'
+                        });
+                    },
+                    fail_alert : true
+                })
+            };
+            Messenger.alert().Modal({
+                icon : 'robot',
+                backdrop_ctrl : false,
+                theme : 'dark',
+                title : 'Loading Bot Packages...',
+                pre_loader : true,
+                overflow : true,
+                unlock_buttons : false,
+                h4 : false,
+                size : 'lg',
+                onReady : gather
+            });
         },
         addBot : function(){
             Messenger.alert().Modal({
@@ -416,6 +454,28 @@ window.ThreadBots = (function () {
                 fail_keep_open : true,
             });
         },
+        installBotPackage : function(alias){
+            if (!methods.setThread()) return;
+            Messenger.alert().fillModal({
+                loader : true,
+                title : 'Installing Bot...'
+            });
+            Messenger.xhr().payload({
+                route : Messenger.common().API + 'threads/' + opt.thread.id + '/bots/packages',
+                data : {
+                    alias : alias,
+                },
+                success : function(bot){
+                    methods.viewBot(bot.id);
+                    Messenger.alert().Alert({
+                        toast : true,
+                        theme : 'success',
+                        title : bot.name+' was successfully installed.'
+                    });
+                },
+                fail_alert : true,
+            });
+        },
         updateBot : function(id){
             if (!methods.setThread()) return;
             Messenger.xhr().payload({
@@ -524,6 +584,44 @@ window.ThreadBots = (function () {
                 bots.forEach((bot) => { table_fill += bot_fill(bot)})
             }
             return table_top+table_fill+table_bot
+        },
+        create_or_install : function(){
+            return '<div class="card mt-3">' +
+                '<div class="card-body bg-light shadow rounded">' +
+                '<h4>Would you like to create your own bot or install a ready-made bot package?</h4>' +
+                '</div>' +
+                '</div><hr>' +
+                '<div class="col-12 text-center mt-3">' +
+                '<button type="button" onclick="ThreadBots.addBot()" class="btn btn-lg btn-primary mr-2"><i class="fas fa-robot"></i> Create Bot</button>' +
+                '<button type="button" onclick="ThreadBots.viewBotPackages()" class="btn btn-lg btn-primary"><i class="fas fa-server"></i> Install Bot Package</button>' +
+                '</div>';
+        },
+        bot_packages : function(packages){
+            if(!packages.length){
+                return '<div class="card mt-3">' +
+                    '<div class="card-body bg-warning shadow rounded text-center">' +
+                    '<h4>There are no available bot packages to install.</h4>' +
+                    '</div></div>';
+            }
+            let html = '';
+            let package_fill = (packaged_bot) => {
+                let install_list = '';
+                packaged_bot.installs.forEach((install) => {
+                    install_list += '<li><u>'+install.name+'</u> - '+install.description+'</li>'
+                });
+                return  '<div class="col-12 bg-light rounded py-3 mb-2">' +
+                    '<div class="col-12 h3"><img height="75" width="75" class="mr-3 rounded avatar-is-online" src="'+packaged_bot.avatar.md+'"  alt="Bot Package"/><u>'+packaged_bot.name+'</u></div>' +
+                    '<hr><h5>Description: '+packaged_bot.description+'</h5>' +
+                    '<hr><h4>Installs:</h4>' +
+                    '<ul>'+install_list+'</ul>' +
+                    '<hr>' +
+                    '<div class="col-12 text-center"><button onclick="ThreadBots.installBotPackage(\''+packaged_bot.alias+'\')" type="button" class="btn btn-md btn-primary"><i class="fas fa-robot"></i> Install '+packaged_bot.name+'</button> </div> ' +
+                    '</div><hr>';
+            };
+            packages.forEach((packaged_bot) => {
+                html += package_fill(packaged_bot)
+            });
+            return html;
         },
         add_bot : function(){
             return '<form id="new_bot_form" action="">\n' +
@@ -1027,7 +1125,10 @@ window.ThreadBots = (function () {
     return {
         init : mounted.Initialize,
         viewBots : methods.viewBots,
+        addBot : methods.addBot,
         viewBot : methods.viewBot,
+        viewBotPackages : methods.viewBotPackages,
+        installBotPackage : methods.installBotPackage,
         editBot : methods.editBot,
         removeAvatar : methods.removeAvatar,
         removeBot : methods.removeBot,
