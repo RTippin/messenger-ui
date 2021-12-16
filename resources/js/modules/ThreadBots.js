@@ -252,6 +252,7 @@ window.ThreadBots = (function () {
                 case 'invitations':
                     extra = handlers.invite_lifetime(opt.current_action.payload);
                 break;
+                case 'document_finder':
                 case 'wiki':
                 case 'youtube':
                     extra = handlers.result_limit(opt.current_action.payload);
@@ -315,6 +316,7 @@ window.ThreadBots = (function () {
                 case 'invitations':
                     extra = handlers.invite_lifetime();
                 break;
+                case 'document_finder':
                 case 'wiki':
                 case 'youtube':
                     extra = handlers.result_limit()
@@ -388,7 +390,7 @@ window.ThreadBots = (function () {
             if(handler.alias === 'invitations'){
                 form.lifetime_minutes = parseInt($("#g_s_bot_inv_lifetime").val());
             }
-            if(['wiki', 'youtube'].includes(handler.alias)){
+            if(['document_finder', 'wiki', 'youtube'].includes(handler.alias)){
                 form.limit = parseInt($("#g_s_bot_result_limit").val());
             }
             return form;
@@ -587,13 +589,13 @@ window.ThreadBots = (function () {
         },
         create_or_install : function(){
             return '<div class="card mt-3">' +
-                '<div class="card-body bg-light shadow rounded">' +
+                '<div class="card-body bg-primary shadow rounded">' +
                 '<h4>Would you like to create your own bot or install a ready-made bot package?</h4>' +
                 '</div>' +
                 '</div><hr>' +
                 '<div class="col-12 text-center mt-3">' +
-                '<button type="button" onclick="ThreadBots.addBot()" class="btn btn-lg btn-primary mr-2"><i class="fas fa-robot"></i> Create Bot</button>' +
-                '<button type="button" onclick="ThreadBots.viewBotPackages()" class="btn btn-lg btn-primary"><i class="fas fa-server"></i> Install Bot Package</button>' +
+                '<button type="button" onclick="ThreadBots.addBot()" class="btn btn-lg btn-primary mt-2 mr-2"><i class="fas fa-robot"></i> Create</button>' +
+                '<button type="button" onclick="ThreadBots.viewBotPackages()" class="btn btn-lg btn-primary mt-2"><i class="fas fa-server"></i> Install Package</button>' +
                 '</div>';
         },
         bot_packages : function(packages){
@@ -605,16 +607,29 @@ window.ThreadBots = (function () {
             }
             let html = '';
             let package_fill = (packaged_bot) => {
-                let install_list = '';
-                packaged_bot.installs.forEach((install) => {
-                    install_list += '<li><u>'+install.name+'</u> - '+install.description+'</li>'
-                });
+                let install_list = '',
+                    already_installed_list = '',
+                    useInstalls = false,
+                    useAlreadyInstalled = false;
+                if(packaged_bot.installs.length){
+                    useInstalls = true;
+                    packaged_bot.installs.forEach((install) => {
+                        install_list += '<li><u>'+install.name+'</u> - '+install.description+'</li>'
+                    });
+                }
+                if(packaged_bot.already_installed.length){
+                    useAlreadyInstalled = true;
+                    packaged_bot.already_installed.forEach((installed) => {
+                        already_installed_list += '<li><u>'+installed.name+'</u> - '+installed.description+'</li>'
+                    });
+                }
                 return  '<div class="col-12 bg-light rounded py-3 mb-2">' +
                     '<div class="col-12 h3"><img height="75" width="75" class="mr-3 rounded avatar-is-online" src="'+packaged_bot.avatar.md+'"  alt="Bot Package"/><u>'+packaged_bot.name+'</u></div>' +
                     '<hr><h5>Description: '+packaged_bot.description+'</h5>' +
-                    '<hr><h4>Installs:</h4>' +
-                    '<ul>'+install_list+'</ul>' +
+                    '<hr><h4>Installs: '+(useInstalls ? '' : '<span class="badge badge-warning">Nothing to install.</span>')+'</h4>' +
+                    (useInstalls ? '<ul>'+install_list+'</ul>' : '') +
                     '<hr>' +
+                    (useAlreadyInstalled ? '<h4>Already Installed:</h4><ul>'+already_installed_list+'</ul><hr>' : '') +
                     '<div class="col-12 text-center"><button onclick="ThreadBots.installBotPackage(\''+packaged_bot.alias+'\')" type="button" class="btn btn-md btn-primary"><i class="fas fa-robot"></i> Install '+packaged_bot.name+'</button> </div> ' +
                     '</div><hr>';
             };
@@ -846,6 +861,7 @@ window.ThreadBots = (function () {
                         return 'Lifetime of '+action.payload.lifetime_minutes+' minutes';
                     }
                 break;
+                case 'document_finder':
                 case 'youtube':
                 case 'wiki':
                     if(action.payload){
@@ -1092,7 +1108,7 @@ window.ThreadBots = (function () {
                 '</div>';
         },
         result_limit : function(payload){
-            let limit = 1;
+            let limit = 3;
             if(payload){
                 limit = payload.limit;
             }
