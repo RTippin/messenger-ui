@@ -26,11 +26,11 @@ window.FriendsManager = (function () {
         },
         cancel_request : function(data){
             if("dropdown" in data){
-                return '<a class="dropdown-item network_option" onclick="FriendsManager.action({dropdown : true, provider_id : \''+data.recipient.provider_id+'\', action : \'cancel\', sent_friend_id : \''+data.id+'\'}); return false;" href="#">' +
+                return '<a class="dropdown-item network_option" onclick="FriendsManager.action({dropdown : true, provider_id : \''+data.recipient.provider_id+'\', action : \'cancel\', sent_friend_id : \''+data.id+'\', provider_alias : \''+data.recipient.provider_alias+'\'}); return false;" href="#">' +
                     '<i class="fas fa-ban"></i> Cancel friend request</a>';
             }
             return '<button id="cancel_network_'+data.provider_id+'" data-toggle="tooltip" title="Cancel friend request" data-placement="top" class="btn btn-danger pt-1 pb-0 px-2" ' +
-                'onclick="FriendsManager.action({provider_id : \''+data.recipient.provider_id+'\', action : \'cancel\', sent_friend_id : \''+data.id+'\'});"><i class="fas fa-ban fa-2x"></i></button>';
+                'onclick="FriendsManager.action({provider_id : \''+data.recipient.provider_id+'\', action : \'cancel\', sent_friend_id : \''+data.id+'\', provider_alias : \''+data.recipient.provider_alias+'\'});"><i class="fas fa-ban fa-2x"></i></button>';
         }
     },
     methods = {
@@ -108,7 +108,7 @@ window.FriendsManager = (function () {
                     if(elm.length) elm.html(templates.add_to(provider));
                     Messenger.alert().Alert({
                         title : 'Friends',
-                        body : 'Cancelled friend request to ' + provider.name + '.',
+                        body : 'Friend request cancelled.',
                         toast : true,
                         theme : 'warning'
                     });
@@ -128,7 +128,7 @@ window.FriendsManager = (function () {
                     if(elm.length) elm.html(templates.add_to(provider));
                     Messenger.alert().Alert({
                         title : 'Friends',
-                        body : 'Denied friend request from ' + provider.name + '.',
+                        body : 'Friend request denied.',
                         toast : true,
                         theme : 'error'
                     });
@@ -148,7 +148,7 @@ window.FriendsManager = (function () {
                     if(elm.length) elm.html(templates.add_to(provider));
                     Messenger.alert().Alert({
                         title : 'Friends',
-                        body : 'Removed ' + provider.name + ' from your friends.',
+                        body : 'Friend removed.',
                         toast : true,
                         theme : 'error'
                     });

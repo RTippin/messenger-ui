@@ -516,8 +516,8 @@ window.ThreadBots = (function () {
             Messenger.xhr().payload({
                 route : Messenger.common().API + 'threads/' + opt.thread.id + '/bots/'+opt.current_bot.id+'/avatar',
                 data : {},
-                success : function(data){
-                    methods.viewBot(data.id)
+                success : function(){
+                    methods.viewBot(opt.current_bot.id)
                 },
                 fail_alert : true
             }, 'delete');
