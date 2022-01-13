@@ -667,6 +667,7 @@ window.NotifyManager = (function () {
                     FriendsManager.action({
                         action : action,
                         provider_id : opt.storage.pending_friends[i].sender.provider_id,
+                        provider_alias : opt.storage.pending_friends[i].sender.provider_alias,
                         pending_friend_id : opt.storage.pending_friends[i].id
                     });
                     break;
@@ -680,6 +681,7 @@ window.NotifyManager = (function () {
                     FriendsManager.action({
                         action : 'cancel',
                         provider_id : opt.storage.sent_friends[i].recipient.provider_id,
+                        provider_alias : opt.storage.sent_friends[i].recipient.provider_alias,
                         sent_friend_id : opt.storage.sent_friends[i].id
                     });
                     break;

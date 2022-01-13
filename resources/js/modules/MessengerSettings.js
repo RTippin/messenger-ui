@@ -129,14 +129,18 @@ window.MessengerSettings = (function () {
             }, 'delete');
         },
         manageNewAvatar : function (data) {
-            Messenger.forms().updateSlug(data.owner.avatar.sm);
-            $('.my-global-avatar').attr('src', data.owner.avatar.sm);
-            opt.elements.profile_avatar_upload.value = '';
-            Messenger.alert().Alert({
-                toast : true,
-                theme : 'success',
-                title : 'Your avatar has been updated'
-            })
+            if(data){
+                Messenger.forms().updateSlug(data.owner.avatar.sm);
+                $('.my-global-avatar').attr('src', data.owner.avatar.sm);
+                opt.elements.profile_avatar_upload.value = '';
+                Messenger.alert().Alert({
+                    toast : true,
+                    theme : 'success',
+                    title : 'Your avatar has been updated'
+                })
+            } else {
+                window.location.reload()
+            }
         }
     },
     templates = {
