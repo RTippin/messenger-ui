@@ -14,6 +14,8 @@ window.EmojiPicker = (function () {
             botReactionPicker : null,
             botReactionBtn : null,
             botReactionElm : null,
+            botReactionBombPicker : null,
+            botReactionBombIndex : 0,
     },
     mounted = {
         Initialize : function () {
@@ -33,6 +35,9 @@ window.EmojiPicker = (function () {
             }
             if(opt.botReactionPicker !== null){
                 opt.botReactionPicker.setTheme(dark ? 'dark' : 'light')
+            }
+            if(opt.botReactionBombPicker !== null){
+                opt.botReactionBombPicker.setTheme(dark ? 'dark' : 'light')
             }
         },
         addReaction : function(messageId){
@@ -91,6 +96,19 @@ window.EmojiPicker = (function () {
             opt.botReactionBtn = document.getElementById('bot_reaction_emoji_btn');
             opt.botReactionPicker.showPicker(opt.botReactionBtn);
         },
+        botActionReactBomb : function(index){
+            opt.botReactionBombIndex = index;
+            if(opt.botReactionBombPicker === null){
+                opt.botReactionBombPicker = new EmojiButton({
+                    theme: Messenger.common().dark_mode ? 'dark' : 'light',
+                });
+                opt.botReactionBombPicker.on('emoji', methods.botReactBombSelection);
+            }
+            opt.botReactionBombPicker.showPicker(document.getElementById('bot_reaction_bomb_btn_'+index));
+        },
+        resetBotActionReactBomb : function(index){
+            document.getElementById('bot_reaction_bomb_'+index).value = '';
+        },
         sendReaction : function(selection){
             ThreadManager.addNewReaction({
                 message_id : opt.reactionMessageId,
@@ -116,6 +134,9 @@ window.EmojiPicker = (function () {
         },
         botReactSelection : function(selection){
             opt.botReactionElm.value = selection.emoji;
+        },
+        botReactBombSelection : function(selection){
+            document.getElementById('bot_reaction_bomb_'+opt.botReactionBombIndex).value = selection.emoji;
         }
     };
     return {
@@ -124,6 +145,8 @@ window.EmojiPicker = (function () {
         addMessage : methods.addMessage,
         editMessage : methods.editMessage,
         botActionReact : methods.botActionReact,
+        botActionReactBomb : methods.botActionReactBomb,
+        resetBotActionReactBomb : methods.resetBotActionReactBomb,
         updateThemes : methods.updateThemes,
         lock : function(arg){
             if(typeof arg === 'boolean') opt.lock = arg

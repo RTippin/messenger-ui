@@ -246,6 +246,9 @@ window.ThreadBots = (function () {
                 case 'react':
                     extra = handlers.reaction(opt.current_action.payload.reaction);
                 break;
+                case 'react_bomb':
+                    extra = handlers.reaction_bomb(opt.current_action.payload.reactions);
+                break;
                 case 'reply':
                     extra = handlers.replies(opt.current_action.payload);
                 break;
@@ -310,6 +313,9 @@ window.ThreadBots = (function () {
                 case 'react':
                     extra = handlers.reaction();
                 break;
+                case 'react_bomb':
+                    extra = handlers.reaction_bomb();
+                break;
                 case 'reply':
                     extra = handlers.replies();
                 break;
@@ -372,6 +378,13 @@ window.ThreadBots = (function () {
             }
             if(handler.alias === 'react'){
                 form.reaction = $("#g_s_bot_reaction").val();
+            }
+            if(handler.alias === 'react_bomb'){
+                form.reactions = [];
+                for (let i = 0; i < 10; i++) {
+                    let bomb_emoji = $("#bot_reaction_bomb_"+i).val();
+                    if(bomb_emoji.trim().length) form.reactions.push(bomb_emoji)
+                }
             }
             if(handler.alias === 'reply'){
                 form.quote_original = $("#g_s_quote_original").is(":checked");
@@ -852,6 +865,8 @@ window.ThreadBots = (function () {
             switch(action.handler.alias){
                 case 'react':
                     return Messenger.format().shortcodeToImage(action.payload.reaction);
+                case 'react_bomb':
+                    return Messenger.format().shortcodeToImage(action.payload.reactions.join('<span class="mr-1"></span>'));
                 case 'reply':
                     let replies = '<ul class="p-0 my-0 mr-0 ml-1">';
                     action.payload.replies.forEach((reply) => replies += '<li>'+Messenger.format().shortcodeToImage(reply)+'</li>');
@@ -1064,13 +1079,35 @@ window.ThreadBots = (function () {
             }
             return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
                 '    <div class="col-12"><h5 class="font-weight-bold">Reaction: [ emoji ]</h5></div>' +
-                '    <div class="input-group input-group-lg col-12 col-lg-6 offset-lg-3 mb-0">\n' +
-                '         <input onclick="EmojiPicker.botActionReact()" readonly autocomplete="off" class="form-control font-weight-bold shadow-sm" id="g_s_bot_reaction" placeholder="Pick an emoji!" name="bot-reaction-'+Date.now()+'" required value="'+value+'">' +
+                '    <div class="input-group input-group-lg col-12 col-md-4 offset-md-4">\n' +
+                '         <input onclick="EmojiPicker.botActionReact()" readonly autocomplete="off" class="form-control font-weight-bold shadow-sm" id="g_s_bot_reaction" placeholder="Pick emoji" name="bot-reaction-'+Date.now()+'" required value="'+value+'">' +
                 '         <div class="input-group-append">\n' +
-                '           <button onclick="EmojiPicker.botActionReact()" class="btn btn-danger" type="button" id="bot_reaction_emoji_btn"><i class="fas fa-grin"></i></button>\n' +
+                '           <button onclick="EmojiPicker.botActionReact()" class="btn btn-primary" type="button" id="bot_reaction_emoji_btn"><i class="fas fa-grin"></i></button>\n' +
                 '         </div>' +
-                '     </div>\n' +
+                '     </div>' +
                 '</div>';
+        },
+        reaction_bomb : function(reactions){
+            let fields = '';
+            let field = (index) => {
+                let emoji = (reactions && reactions.hasOwnProperty(index))
+                    ? Messenger.format().shortcodeToUnicode(reactions[index])
+                    : '';
+                return '<div class="input-group input-group-lg col-12 col-md-4 offset-md-4 mb-2">\n' +
+                    '<div class="input-group-prepend">\n' +
+                    '    <button onclick="EmojiPicker.resetBotActionReactBomb('+index+')" class="btn btn-danger" type="button"><i class="fas fa-trash"></i></button>\n' +
+                    '</div>' +
+                    '<input onclick="EmojiPicker.botActionReactBomb('+index+')" readonly autocomplete="off" class="form-control font-weight-bold shadow-sm" id="bot_reaction_bomb_'+index+'" placeholder="Pick emoji" name="bot-reaction-'+Date.now()+'" required value="'+emoji+'">' +
+                    '  <div class="input-group-append">\n' +
+                    '    <button onclick="EmojiPicker.botActionReactBomb('+index+')" class="btn btn-primary" type="button" id="bot_reaction_bomb_btn_'+index+'"><i class="fas fa-grin"></i></button>\n' +
+                    '  </div>' +
+                    '</div>'
+            };
+            for (let i = 0; i < 10; i++) {
+                fields += field(i)
+            }
+            return '<hr><div class="form-row mx-n2 rounded bg-light text-dark pt-2 pb-3 px-2 shadow-sm">\n' +
+                ' <div class="col-12"><h5 class="font-weight-bold">Reactions: [ emojis ]</h5></div>' + fields + '</div>';
         },
         replies : function(payload){
             let quote = false, reply1 = '', reply2 = '', reply3 = '', reply4 = '', reply5 = '';
