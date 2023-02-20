@@ -4,12 +4,12 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Richard Tippin",
-            "email": "tippindev@gmail.com",
+            "name": "Baskar C",
+            "email": "baskarmca.php@gmail.com",
             "homepage": "https://tippindev.com"
         }
     ],
-    "homepage": "https://github.com/rtippin/messenger-ui",
+    "homepage": "https://github.com/baskarcm/messenger-ui",
     "keywords": [
         "Laravel",
         "Messenger"
