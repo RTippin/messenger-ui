@@ -28,7 +28,7 @@
 ### Via Composer
 
 ``` bash
-composer require rtippin/messenger-ui
+composer require bac/messenger-ui
 ```
 
 ### Publish Assets and Config
