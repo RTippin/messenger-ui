@@ -28,7 +28,7 @@
 ### Via Composer
 
 ``` bash
-composer require bac/messenger-ui
+composer require basc/messenger-ui
 ```
 
 ### Publish Assets and Config
