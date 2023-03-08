@@ -1,19 +1,13 @@
 {
-    "name": "baskarc/laravel-messenger-ui",
+    "name": "baskarcm/messenger-ui",
     "description": "Laravel messenger suite UI.",
-    "require": {
-        "laravel-messenger-ui": "1"
-    },
     "license": "mit",
     "autoload": {
         "psr-4": {
-            "Baskarc\\LaravelMessengerUi\\": "src/"
+            "Baskarcm\\MessengerUi\\": "src/"
         }
     },
-    "authors": [
-        {
-            "name": "baskar",
-            "email": "baskarmca.php@gmail.com"
-        }
-    ]
+    "require": {
+        "baskarcm-messenger-ui": "1"
+    }
 }
