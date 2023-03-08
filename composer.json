@@ -1,37 +1,19 @@
 {
-    "name": "basc/messenger-ui",
+    "name": "baskarc/laravel-messenger-ui",
     "description": "Laravel messenger suite UI.",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Baskar C",
-            "email": "baskarmca.php@gmail.com",
-            "homepage": "https://tippindev.com"
-        }
-    ],
-    "homepage": "https://github.com/baskarcm/messenger-ui",
-    "keywords": [
-        "Laravel",
-        "Messenger"
-    ],
     "require": {
-        "rtippin/messenger": "^1.19"
+        "laravel-messenger-ui": "1"
     },
+    "license": "mit",
     "autoload": {
         "psr-4": {
-            "RTippin\\MessengerUi\\": "src/"
+            "Baskarc\\LaravelMessengerUi\\": "src/"
         }
     },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "RTippin\\MessengerUi\\MessengerUiServiceProvider"
-            ]
+    "authors": [
+        {
+            "name": "baskar",
+            "email": "baskarmca.php@gmail.com"
         }
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true
+    ]
 }
