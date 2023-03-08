@@ -11,7 +11,7 @@
 
 ---
 
-## Ready-made UI and web routes for use with [rtippin/messenger][link-messenger]
+## Ready-made UI and web routes for use with [baskarcm/messenger-ui][link-messenger]
 
 ### Notes
 - This package provides web routes and a published UI to consume `messenger's` API. No authentication routes/system will be setup for you.
@@ -28,7 +28,7 @@
 ### Via Composer
 
 ``` bash
-composer require basc/messenger-ui
+composer require baskarc/laravel-messenger-ui
 ```
 
 ### Publish Assets and Config
@@ -157,16 +157,3 @@ MESSENGER_SOCKET_KEY="${PUSHER_APP_KEY}"
 - You are all set! Our UI will connect to your server running `php artisan websockets:serve`. Be sure to enable `client events` in your `laravel-websockets` config if you want our client to client events enabled.
 
 
-[link-messenger]: https://github.com/RTippin/messenger
-[link-author]: https://github.com/rtippin
-[ico-version]: https://img.shields.io/packagist/v/rtippin/messenger-ui.svg?style=plastic&cacheSeconds=3600
-[ico-downloads]: https://img.shields.io/packagist/dt/rtippin/messenger-ui.svg?style=plastic&cacheSeconds=3600
-[ico-styleci]: https://styleci.io/repos/379743201/shield?style=plastic&cacheSeconds=3600
-[ico-license]: https://img.shields.io/github/license/RTippin/messenger-ui?style=plastic
-[link-packagist]: https://packagist.org/packages/rtippin/messenger-ui
-[link-downloads]: https://packagist.org/packages/rtippin/messenger-ui
-[link-license]: https://packagist.org/packages/rtippin/messenger-ui
-[link-styleci]: https://styleci.io/repos/379743201
-[link-laravel-websockets]: https://beyondco.de/docs/laravel-websockets/getting-started/introduction
-[link-laravel-websockets-install]: https://beyondco.de/docs/laravel-websockets/getting-started/installation
-[link-pusher]: https://pusher.com/
