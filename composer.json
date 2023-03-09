@@ -1,6 +1,7 @@
 {
     "name": "baskarcm/laravel-chat",
     "description": "Laravel messenger suite UI.",
+    "type": "composer-plugin",
     "license": "mit",
     "autoload": {
         "psr-4": {
@@ -8,6 +9,6 @@
         }
     },
     "require": {
-        "baskarcm-laravel-chat": "1"
+        "baskarcm-laravel-chat": "1.0.0"
     }
 }
