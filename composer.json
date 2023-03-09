@@ -1,13 +1,13 @@
 {
-    "name": "baskarcm/messenger-ui",
+    "name": "baskarcm/laravel-chat",
     "description": "Laravel messenger suite UI.",
     "license": "mit",
     "autoload": {
         "psr-4": {
-            "Baskarcm\\MessengerUi\\": "src/"
+            "Baskarcm\\LaravelChat\\": "src/"
         }
     },
     "require": {
-        "baskarcm-messenger-ui": "1"
+        "baskarcm-laravel-chat": "1"
     }
 }
