@@ -23,7 +23,7 @@ mix.webpackConfig({
     })
     .setPublicPath('public')
     .js('resources/js/app.js', 'public')
-    .js('resources/js/janus/JanusServer.js', 'public')
+    // .js('resources/js/janus/JanusServer.js', 'public')
     .sass('resources/sass/app.scss', 'public')
     .sass('resources/sass/dark.scss', 'public')
     .version();

@@ -30,7 +30,6 @@
     "datatables.net": "^1.10.21",
     "datatables.net-bs4": "^1.10.21",
     "dayjs": "^1.10.6",
-    "janus-gateway": "https://github.com/meetecho/janus-gateway.git",
     "laravel-echo": "^1.10.0",
     "pusher-js": "^7.0.3",
     "simplebar": "^5.2.1",
